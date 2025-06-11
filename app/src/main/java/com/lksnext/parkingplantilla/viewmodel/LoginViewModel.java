@@ -17,7 +17,11 @@ public class LoginViewModel extends ViewModel {
     }
 
     public void loginUser(String email, String password) {
-        //Clase para comprobar si los datos de inicio de sesión son correctos o no
+        // Por ahora, siempre indica login exitoso sin verificar credenciales
+        // para poder desarrollar la parte visual primero
+        logged.setValue(Boolean.TRUE);
+
+        /* Código original comentado para uso futuro
         DataRepository.getInstance().login(email, password, new Callback() {
             //En caso de que el login sea correcto, que se hace
             @Override
@@ -33,6 +37,6 @@ public class LoginViewModel extends ViewModel {
                 logged.setValue(Boolean.FALSE);
             }
         });
+        */
     }
 }
-

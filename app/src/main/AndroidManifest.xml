@@ -23,6 +23,12 @@
         <activity
             android:name=".view.activity.MainActivity"
             android:exported="true" />
+        <activity
+            android:name=".view.activity.UserActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.activity.RecoverPasswordActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

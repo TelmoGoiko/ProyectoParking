@@ -27,14 +27,20 @@ public class LoginActivity extends AppCompatActivity {
 
         //Acciones a realizar cuando el usuario clica el boton de login
         binding.loginButton.setOnClickListener(v -> {
-            String email = binding.emailText.getText().toString();
-            String password = binding.passwordText.getText().toString();
+            String email = binding.username.getText().toString();
+            String password = binding.password.getText().toString();
             loginViewModel.loginUser(email, password);
         });
 
         //Acciones a realizar cuando el usuario clica el boton de crear cuenta (se cambia de pantalla)
         binding.createAccount.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
+        });
+
+        //Acción para recuperar contraseña
+        binding.forgotPassword.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, RecoverPasswordActivity.class);
             startActivity(intent);
         });
 
