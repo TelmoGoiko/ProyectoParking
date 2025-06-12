@@ -10,6 +10,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ParkingLKS">
         <activity
+            android:name=".view.activity.EditarReservaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.activity.MisReservasActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.activity.AddEditVehicleActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.activity.MisVehiculosActivity"
+            android:exported="false" />
+        <activity
             android:name=".view.activity.RegisterActivity"
             android:exported="false" />
         <activity
