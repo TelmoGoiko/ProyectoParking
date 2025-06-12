@@ -13,4 +13,18 @@
     <string name="google">Google</string>
     <string name="facebook">Facebook</string>
     <string name="no_tienes_cuenta_reg_strate">¿No tienes cuenta? Regístrate</string>
+
+    <!-- Strings para MisReservasActivity y EditarReservaActivity -->
+    <string name="mis_reservas">Mis Reservas</string>
+    <string name="volver">Volver</string>
+    <string name="no_tienes_reservas">No tienes reservas activas</string>
+    <string name="editar_reserva">Editar Reserva</string>
+    <string name="parking">Parking:</string>
+    <string name="fecha">Fecha:</string>
+    <string name="hora_inicio">Hora Inicio:</string>
+    <string name="hora_fin">Hora Fin:</string>
+    <string name="estado">Estado:</string>
+    <string name="guardar_cambios">Guardar Cambios</string>
+    <string name="eliminar">Eliminar</string>
+    <string name="editar">Editar</string>
 </resources>

@@ -118,14 +118,30 @@ public class MainActivity extends AppCompatActivity {
 
         // Configurar el botón "Mis Reservas"
         binding.btnMisReservas.setOnClickListener(v -> {
-            // TODO: Implementar navegación a la pantalla de mis reservas
-            showToast("Mis Reservas");
+            try {
+                // Navegar a la pantalla de mis reservas
+                Intent intent = new Intent(MainActivity.this, MisReservasActivity.class);
+                startActivity(intent);
+            } catch (Exception e) {
+                // Mostrar el error para diagnóstico
+                String errorMessage = "Error al abrir pantalla de reservas: " + e.getMessage();
+                android.util.Log.e("MainActivity", errorMessage, e);
+                Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+            }
         });
 
         // Configurar el botón "Mis Vehículos"
         binding.btnMisVehiculos.setOnClickListener(v -> {
-            // TODO: Implementar navegación a la pantalla de mis vehículos
-            showToast("Mis Vehículos");
+            try {
+                // Navegar a la pantalla de gestión de vehículos
+                Intent intent = new Intent(MainActivity.this, MisVehiculosActivity.class);
+                startActivity(intent);
+            } catch (Exception e) {
+                // Mostrar el error para diagnóstico
+                String errorMessage = "Error al abrir pantalla de vehículos: " + e.getMessage();
+                android.util.Log.e("MainActivity", errorMessage, e);
+                Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+            }
         });
     }
 
