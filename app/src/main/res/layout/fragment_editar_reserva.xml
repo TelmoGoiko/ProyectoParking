@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    tools:context=".view.activity.EditarReservaActivity">
+    tools:context=".view.fragment.EditarReservaFragment">
 
     <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
@@ -26,7 +26,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/volver"
                 android:padding="8dp"
-                android:src="@drawable/ic_back"
+                android:src="@drawable/ic_arrow_back"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -203,3 +203,4 @@
     </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

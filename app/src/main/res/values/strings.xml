@@ -27,4 +27,9 @@
     <string name="guardar_cambios">Guardar Cambios</string>
     <string name="eliminar">Eliminar</string>
     <string name="editar">Editar</string>
+    <string name="eliminar_reserva_titulo">Eliminar reserva</string>
+    <string name="eliminar_reserva_mensaje">¿Estás seguro de que deseas eliminar esta reserva?</string>
+    <string name="si">Sí</string>
+    <string name="no">No</string>
+    <string name="reservar">Reservar</string>
 </resources>

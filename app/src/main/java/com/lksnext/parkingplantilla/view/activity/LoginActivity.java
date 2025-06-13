@@ -52,6 +52,7 @@ public class LoginActivity extends AppCompatActivity {
                     //Login Correcto
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
+                    finish(); // Cierra LoginActivity para que no se pueda volver atrás
                 } else {
                     //Login incorrecto
                 }

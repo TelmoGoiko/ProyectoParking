@@ -10,18 +10,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ParkingLKS">
         <activity
-            android:name=".view.activity.EditarReservaActivity"
-            android:exported="false" />
-        <activity
-            android:name=".view.activity.MisReservasActivity"
-            android:exported="false" />
-        <activity
-            android:name=".view.activity.AddEditVehicleActivity"
-            android:exported="false" />
-        <activity
-            android:name=".view.activity.MisVehiculosActivity"
-            android:exported="false" />
-        <activity
             android:name=".view.activity.RegisterActivity"
             android:exported="false" />
         <activity
@@ -35,9 +23,6 @@
         <activity
             android:name=".view.activity.MainActivity"
             android:exported="true" />
-        <activity
-            android:name=".view.activity.UserActivity"
-            android:exported="false" />
         <activity
             android:name=".view.activity.RecoverPasswordActivity"
             android:exported="false" />

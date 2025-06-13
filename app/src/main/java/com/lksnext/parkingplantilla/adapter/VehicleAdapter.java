@@ -54,6 +54,12 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
         notifyDataSetChanged();
     }
 
+    public void updateVehicleList(List<Vehicle> newVehicles) {
+        this.vehicles.clear();
+        this.vehicles.addAll(newVehicles);
+        notifyDataSetChanged();
+    }
+
     class VehicleViewHolder extends RecyclerView.ViewHolder {
         private TextView tvVehiculoNombre;
         private TextView tvMatricula;

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/mainMenuFragment">
+
+    <fragment
+        android:id="@+id/mainMenuFragment"
+        android:name="com.lksnext.parkingplantilla.view.fragment.MainMenuFragment"
+        android:label="Menú Principal"
+        tools:layout="@layout/fragment_main_menu" />
+    <fragment
+        android:id="@+id/userFragment"
+        android:name="com.lksnext.parkingplantilla.view.fragment.UserFragment"
+        android:label="Usuario"
+        tools:layout="@layout/fragment_user" />
+    <fragment
+        android:id="@+id/aparcarYaFragment"
+        android:name="com.lksnext.parkingplantilla.view.fragment.AparcarYaFragment"
+        android:label="Aparcar Ya"
+        tools:layout="@layout/fragment_aparcar_ya" />
+    <fragment
+        android:id="@+id/reservarFragment"
+        android:name="com.lksnext.parkingplantilla.view.fragment.ReservarFragment"
+        android:label="Reservar"
+        tools:layout="@layout/fragment_reservar" />
+    <fragment
+        android:id="@+id/misReservasFragment"
+        android:name="com.lksnext.parkingplantilla.view.fragment.MisReservasFragment"
+        android:label="Mis Reservas"
+        tools:layout="@layout/fragment_mis_reservas" />
+    <fragment
+        android:id="@+id/misVehiculosFragment"
+        android:name="com.lksnext.parkingplantilla.view.fragment.MisVehiculosFragment"
+        android:label="Mis Vehículos"
+        tools:layout="@layout/fragment_mis_vehiculos" />
+    <fragment
+        android:id="@+id/elegirReservaFragment"
+        android:name="com.lksnext.parkingplantilla.view.fragment.ElegirReservaFragment"
+        android:label="Elegir tipo de reserva"
+        tools:layout="@layout/fragment_elegir_reserva">
+        <action
+            android:id="@+id/action_elegirReservaFragment_to_reservarFragment"
+            app:destination="@id/reservarFragment" />
+        <action
+            android:id="@+id/action_elegirReservaFragment_to_aparcarYaFragment"
+            app:destination="@id/aparcarYaFragment" />
+    </fragment>
+
+</navigation>

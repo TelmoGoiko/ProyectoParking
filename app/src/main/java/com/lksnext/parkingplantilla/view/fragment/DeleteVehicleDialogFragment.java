@@ -1,9 +1,8 @@
-package com.lksnext.parkingplantilla.view.activity;
+package com.lksnext.parkingplantilla.view.fragment;
 
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

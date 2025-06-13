@@ -14,4 +14,6 @@
     <!-- Colores adicionales para la aplicación -->
     <color name="primary">#1976D2</color>
     <color name="background">#F5F5F5</color>
+    <color name="colorPrimary">#1976D2</color>
+    <color name="colorAccent">#FF6E40</color>
 </resources>
