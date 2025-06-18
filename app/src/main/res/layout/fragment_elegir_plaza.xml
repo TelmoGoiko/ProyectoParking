@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context=".view.fragment.ElegirPlazaFragment">
+
+    <!-- Toolbar con título y botón de atrás -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_elegir_plaza"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:layout_constraintTop_toTopOf="parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Elegir Plaza"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_new_reservation"
+                android:layout_marginEnd="16dp"
+                app:tint="@color/colorPrimary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- Contenido principal -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_elegir_plaza"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Mapa o representación del parking -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardMapaParking"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/cardDetallesReserva"
+            app:layout_constraintHeight_percent="0.5">
+
+            <FrameLayout
+                android:id="@+id/contenedorMapa"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#E0E0E0">
+
+                <!-- Aquí iría el mapa real del parking -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mapa del Parking"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center"/>
+
+                <!-- Representación visual de las plazas disponibles/ocupadas -->
+                <!-- Se implementará con vistas dinámicas -->
+            </FrameLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Tarjeta con detalles de la reserva actual -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardDetallesReserva"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:layout_constraintBottom_toTopOf="@id/btnContinuar"
+            app:layout_constraintTop_toBottomOf="@id/cardMapaParking">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Sección de fecha/hora (clicable) -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/contenedorFechaHora"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/tvTituloDetallesFecha"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Fecha y Hora"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/tvFechaHoraEntrada"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Entrada: 18/06/2025 10:00"
+                        android:textSize="14sp"
+                        android:layout_marginTop="8dp"
+                        app:layout_constraintTop_toBottomOf="@id/tvTituloDetallesFecha"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/ivEditarFecha"/>
+
+                    <TextView
+                        android:id="@+id/tvFechaHoraSalida"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Salida: 18/06/2025 12:00"
+                        android:textSize="14sp"
+                        app:layout_constraintTop_toBottomOf="@id/tvFechaHoraEntrada"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/ivEditarFecha"/>
+
+                    <ImageView
+                        android:id="@+id/ivEditarFecha"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_arrow_back"
+                        android:rotation="180"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:tint="@color/colorPrimary"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#DDDDDD"/>
+
+                <!-- Sección de vehículo (clicable) -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/contenedorVehiculo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/tvTituloDetallesVehiculo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Vehículo y Parking"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/tvVehiculo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Vehículo: Renault Clio (1234 ABC)"
+                        android:textSize="14sp"
+                        android:layout_marginTop="8dp"
+                        app:layout_constraintTop_toBottomOf="@id/tvTituloDetallesVehiculo"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/ivEditarVehiculo"/>
+
+                    <TextView
+                        android:id="@+id/tvLugar"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Parking: Central - Nivel 1"
+                        android:textSize="14sp"
+                        app:layout_constraintTop_toBottomOf="@id/tvVehiculo"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/ivEditarVehiculo"/>
+
+                    <ImageView
+                        android:id="@+id/ivEditarVehiculo"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_arrow_back"
+                        android:rotation="180"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:tint="@color/colorPrimary"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Botón para continuar al checkout -->
+        <Button
+            android:id="@+id/btnContinuar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Continuar a Pago"
+            android:textColor="@android:color/white"
+            android:backgroundTint="@color/colorPrimary"
+            android:padding="12dp"
+            android:layout_margin="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

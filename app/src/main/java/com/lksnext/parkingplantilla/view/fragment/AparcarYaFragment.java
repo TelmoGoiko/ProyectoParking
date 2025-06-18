@@ -1,15 +1,17 @@
 package com.lksnext.parkingplantilla.view.fragment;
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
+import android.widget.TimePicker;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+import com.lksnext.parkingplantilla.R;
 import com.lksnext.parkingplantilla.databinding.FragmentAparcarYaBinding;
 import java.util.Calendar;
 
@@ -28,54 +30,51 @@ public class AparcarYaFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        actualizarTextoFecha();
-        actualizarTextoHora();
-        binding.btnSeleccionarFecha.setOnClickListener(v -> mostrarDatePicker());
-        binding.btnSeleccionarHora.setOnClickListener(v -> mostrarTimePicker());
-        binding.btnAparcar.setOnClickListener(v -> {
-            String fecha = binding.btnSeleccionarFecha.getText().toString();
-            String hora = binding.btnSeleccionarHora.getText().toString();
-            Toast.makeText(getContext(), "Aparcando el " + fecha + " a las " + hora, Toast.LENGTH_SHORT).show();
-        });
-    }
 
-    private void mostrarDatePicker() {
-        Calendar hoy = Calendar.getInstance();
-        DatePickerDialog dialog = new DatePickerDialog(requireContext(), (view, year, month, dayOfMonth) -> {
-            fechaSeleccionada.set(Calendar.YEAR, year);
-            fechaSeleccionada.set(Calendar.MONTH, month);
-            fechaSeleccionada.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-            actualizarTextoFecha();
-        },
-        fechaSeleccionada.get(Calendar.YEAR),
-        fechaSeleccionada.get(Calendar.MONTH),
-        fechaSeleccionada.get(Calendar.DAY_OF_MONTH));
-        dialog.getDatePicker().setMinDate(hoy.getTimeInMillis());
-        dialog.show();
-    }
+        // Configurar el DatePicker con la fecha actual
+        DatePicker datePicker = binding.datePicker;
+        datePicker.init(
+            fechaSeleccionada.get(Calendar.YEAR),
+            fechaSeleccionada.get(Calendar.MONTH),
+            fechaSeleccionada.get(Calendar.DAY_OF_MONTH),
+            (view1, year, monthOfYear, dayOfMonth) -> {
+                fechaSeleccionada.set(Calendar.YEAR, year);
+                fechaSeleccionada.set(Calendar.MONTH, monthOfYear);
+                fechaSeleccionada.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            }
+        );
 
-    private void mostrarTimePicker() {
-        TimePickerDialog dialog = new TimePickerDialog(requireContext(), (view, hourOfDay, minute) -> {
+        // Configurar el TimePicker con la hora actual
+        TimePicker timePicker = binding.timePicker;
+        timePicker.setIs24HourView(true);
+        timePicker.setHour(horaSeleccionada.get(Calendar.HOUR_OF_DAY));
+        timePicker.setMinute(horaSeleccionada.get(Calendar.MINUTE));
+        timePicker.setOnTimeChangedListener((view1, hourOfDay, minute) -> {
             horaSeleccionada.set(Calendar.HOUR_OF_DAY, hourOfDay);
             horaSeleccionada.set(Calendar.MINUTE, minute);
-            actualizarTextoHora();
-        },
-        horaSeleccionada.get(Calendar.HOUR_OF_DAY),
-        horaSeleccionada.get(Calendar.MINUTE), true);
-        dialog.show();
-    }
+        });
 
-    private void actualizarTextoFecha() {
-        int year = fechaSeleccionada.get(Calendar.YEAR);
-        int month = fechaSeleccionada.get(Calendar.MONTH) + 1;
-        int day = fechaSeleccionada.get(Calendar.DAY_OF_MONTH);
-        binding.btnSeleccionarFecha.setText(String.format("%02d/%02d/%04d", day, month, year));
-    }
+        // Configurar el botón de búsqueda
+        binding.btnAparcar.setOnClickListener(v -> {
+            String fecha = String.format("%02d/%02d/%04d",
+                fechaSeleccionada.get(Calendar.DAY_OF_MONTH),
+                fechaSeleccionada.get(Calendar.MONTH) + 1,
+                fechaSeleccionada.get(Calendar.YEAR));
 
-    private void actualizarTextoHora() {
-        int hour = horaSeleccionada.get(Calendar.HOUR_OF_DAY);
-        int minute = horaSeleccionada.get(Calendar.MINUTE);
-        binding.btnSeleccionarHora.setText(String.format("%02d:%02d", hour, minute));
+            String hora = String.format("%02d:%02d",
+                horaSeleccionada.get(Calendar.HOUR_OF_DAY),
+                horaSeleccionada.get(Calendar.MINUTE));
+
+            Toast.makeText(getContext(), "Aparcando el " + fecha + " a las " + hora, Toast.LENGTH_SHORT).show();
+
+            // Navegar al fragmento de selección de vehículo
+            Navigation.findNavController(view).navigate(R.id.action_aparcarYaFragment_to_seleccionVehiculoFragment);
+        });
+
+        // Configurar el botón de navegación hacia atrás
+        binding.toolbarAparcar.setNavigationOnClickListener(v -> {
+            requireActivity().onBackPressed();
+        });
     }
 
     @Override

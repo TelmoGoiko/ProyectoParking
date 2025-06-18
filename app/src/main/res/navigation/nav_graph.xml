@@ -18,12 +18,20 @@
         android:id="@+id/aparcarYaFragment"
         android:name="com.lksnext.parkingplantilla.view.fragment.AparcarYaFragment"
         android:label="Aparcar Ya"
-        tools:layout="@layout/fragment_aparcar_ya" />
+        tools:layout="@layout/fragment_aparcar_ya">
+        <action
+            android:id="@+id/action_aparcarYaFragment_to_seleccionVehiculoFragment"
+            app:destination="@id/seleccionVehiculoFragment" />
+    </fragment>
     <fragment
         android:id="@+id/reservarFragment"
         android:name="com.lksnext.parkingplantilla.view.fragment.ReservarFragment"
         android:label="Reservar"
-        tools:layout="@layout/fragment_reservar" />
+        tools:layout="@layout/fragment_reservar">
+        <action
+            android:id="@+id/action_reservarFragment_to_seleccionVehiculoFragment"
+            app:destination="@id/seleccionVehiculoFragment" />
+    </fragment>
     <fragment
         android:id="@+id/misReservasFragment"
         android:name="com.lksnext.parkingplantilla.view.fragment.MisReservasFragment"
@@ -45,6 +53,45 @@
         <action
             android:id="@+id/action_elegirReservaFragment_to_aparcarYaFragment"
             app:destination="@id/aparcarYaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/seleccionVehiculoFragment"
+        android:name="com.lksnext.parkingplantilla.view.fragment.SeleccionVehiculoFragment"
+        android:label="Seleccionar Vehículo"
+        tools:layout="@layout/fragment_seleccion_vehiculo">
+        <action
+            android:id="@+id/action_seleccionVehiculoFragment_to_elegirPlazaFragment"
+            app:destination="@id/elegirPlazaFragment" />
+        <action
+            android:id="@+id/action_seleccionVehiculoFragment_to_misVehiculosFragment"
+            app:destination="@id/misVehiculosFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/elegirPlazaFragment"
+        android:name="com.lksnext.parkingplantilla.view.fragment.ElegirPlazaFragment"
+        android:label="Elegir Plaza"
+        tools:layout="@layout/fragment_elegir_plaza">
+        <action
+            android:id="@+id/action_elegirPlazaFragment_to_checkoutFragment"
+            app:destination="@id/checkoutFragment" />
+        <action
+            android:id="@+id/action_elegirPlazaFragment_to_seleccionVehiculoFragment"
+            app:destination="@id/seleccionVehiculoFragment" />
+        <action
+            android:id="@+id/action_elegirPlazaFragment_to_reservarFragment"
+            app:destination="@id/reservarFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/checkoutFragment"
+        android:name="com.lksnext.parkingplantilla.view.fragment.CheckoutFragment"
+        android:label="Finalizar Reserva"
+        tools:layout="@layout/fragment_checkout">
+        <action
+            android:id="@+id/action_checkoutFragment_to_misReservasFragment"
+            app:destination="@id/misReservasFragment" />
+        <action
+            android:id="@+id/action_checkoutFragment_to_elegirPlazaFragment"
+            app:destination="@id/elegirPlazaFragment" />
     </fragment>
 
 </navigation>

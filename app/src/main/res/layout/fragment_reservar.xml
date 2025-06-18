@@ -1,35 +1,223 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="24dp"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    tools:context=".view.fragment.ReservarFragment">
 
-    <ImageView
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:src="@drawable/reservar"
-        android:contentDescription="@string/reservar" />
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_reservar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:layout_constraintTop_toTopOf="parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Reservar"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:layout_marginTop="24dp"
-        android:textColor="#FF6E40" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reservar"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/btnReservar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Buscar parking para reservar"
-        android:layout_marginTop="32dp"
-        android:backgroundTint="#FF6E40"
-        android:textColor="@android:color/white" />
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_new_reservation"
+                android:layout_marginEnd="16dp"
+                app:tint="@color/colorPrimary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.appcompat.widget.Toolbar>
 
-</LinearLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_reservar"
+        app:layout_constraintBottom_toBottomOf="parent">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvTituloReservar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Selecciona el período de reserva"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimary"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="8dp" />
+
+            <!-- Selector Fecha de Entrada -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardStartDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:layout_constraintTop_toBottomOf="@id/tvTituloReservar">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Fecha de entrada"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:padding="8dp"/>
+
+                    <DatePicker
+                        android:id="@+id/datePickerStart"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:datePickerMode="calendar"
+                        android:calendarViewShown="true"
+                        android:spinnersShown="false" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Selector Hora de Entrada -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardStartTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:layout_constraintTop_toBottomOf="@id/cardStartDate">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Hora de entrada"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:padding="8dp"/>
+
+                    <TimePicker
+                        android:id="@+id/timePickerStart"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:timePickerMode="clock" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Selector Fecha de Salida -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardEndDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:layout_constraintTop_toBottomOf="@id/cardStartTime">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Fecha de salida"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:padding="8dp"/>
+
+                    <DatePicker
+                        android:id="@+id/datePickerEnd"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:datePickerMode="calendar"
+                        android:calendarViewShown="true"
+                        android:spinnersShown="false" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Selector Hora de Salida -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardEndTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:layout_constraintTop_toBottomOf="@id/cardEndDate">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Hora de salida"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:padding="8dp"/>
+
+                    <TimePicker
+                        android:id="@+id/timePickerEnd"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:timePickerMode="clock" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <Button
+                android:id="@+id/btnReservar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Buscar parking para reservar"
+                android:backgroundTint="@color/colorAccent"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="24dp"
+                android:padding="16dp"
+                android:textSize="16sp"
+                app:layout_constraintTop_toBottomOf="@id/cardEndTime"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

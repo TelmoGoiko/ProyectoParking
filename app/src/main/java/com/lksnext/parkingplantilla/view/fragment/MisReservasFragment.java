@@ -35,8 +35,12 @@ public class MisReservasFragment extends Fragment {
         // Configurar el RecyclerView
         binding.recyclerViewReservas.setLayoutManager(new LinearLayoutManager(getContext()));
         cargarDatosDePrueba();
-        // El botón de volver puede ocultarse o usarse para navegación interna
-        binding.btnVolver.setVisibility(View.GONE);
+
+        // Configurar la navegación con la flecha de retroceso
+        binding.toolbar.setNavigationOnClickListener(v -> {
+            // Retroceder a la pantalla anterior
+            requireActivity().onBackPressed();
+        });
     }
 
     private void cargarDatosDePrueba() {

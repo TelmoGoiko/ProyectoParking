@@ -24,7 +24,7 @@ public class ElegirReservaFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        binding.toolbar.setNavigationOnClickListener(v -> requireActivity().onBackPressed());
+        binding.toolbarElegirReserva.setNavigationOnClickListener(v -> requireActivity().onBackPressed());
         binding.btnReservar.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_elegirReservaFragment_to_reservarFragment));
         binding.btnAparcarYa.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_elegirReservaFragment_to_aparcarYaFragment));
     }
@@ -35,4 +35,3 @@ public class ElegirReservaFragment extends Fragment {
         binding = null;
     }
 }
-

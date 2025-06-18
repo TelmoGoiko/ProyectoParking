@@ -11,7 +11,7 @@
     <item
         android:id="@+id/reservarFragment"
         android:title="Reservar"
-        android:icon="@drawable/ic_reservations_foreground"/>
+        android:icon="@drawable/ic_new_reservation"/>
     <item
         android:id="@+id/misReservasFragment"
         android:title="Mis Reservas"

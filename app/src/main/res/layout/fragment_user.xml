@@ -6,14 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".view.fragment.UserFragment">
 
+    <!-- Toolbar con título alineado a la izquierda -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_user"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/white"
         android:elevation="4dp"
-        app:title="Perfil de Usuario"
-        app:titleTextColor="#1976D2"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:layout_constraintTop_toTopOf="parent">
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -24,15 +23,26 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Perfil de Usuario"
-                android:textColor="#1976D2"
+                android:textColor="@color/colorPrimary"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.297"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/btnSettings"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_settings"
+                android:layout_marginEnd="16dp"
+                app:tint="@color/colorPrimary"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.551" />
+                app:layout_constraintBottom_toBottomOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.appcompat.widget.Toolbar>
 
@@ -172,6 +182,7 @@
                 android:text="Guardar"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
+                android:backgroundTint="@color/colorPrimary"
                 app:layout_constraintTop_toBottomOf="@id/cardViewInfo" />
             <Button
                 android:id="@+id/btnLogout"
@@ -182,6 +193,7 @@
                 android:text="Cerrar Sesión"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
+                android:backgroundTint="@color/red"
                 app:layout_constraintTop_toBottomOf="@id/btnSave" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
