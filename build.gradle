@@ -14,11 +14,15 @@ plugins {
     id 'com.google.gms.google-services' version '4.4.2' apply false
 }
 
-sonar {
+sonarqube {
     properties {
         property "sonar.projectKey", "TelmoGoiko_ProyectoParking"
         property "sonar.organization", "telmogoiko-1"
         property "sonar.host.url", "https://sonarcloud.io"
+        // Read token from environment if available
+        if (System.getenv("SONAR_TOKEN") != null) {
+            property "sonar.login", System.getenv("SONAR_TOKEN")
+        }
     }
 }
 
