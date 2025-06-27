@@ -28,12 +28,22 @@ public class RegisterActivity extends AppCompatActivity {
         registerViewModel.isRegistered().observe(this, isRegistered -> {
             if (isRegistered == null) return;
             if (isRegistered) {
+                android.widget.Toast.makeText(this, "Registro completado. Ahora puedes iniciar sesión.", android.widget.Toast.LENGTH_LONG).show();
                 finish(); // Cierra la pantalla y vuelve al login
             }
         });
         registerViewModel.getErrorMessage().observe(this, errorMsg -> {
             if (errorMsg != null) {
-                binding.emailLayout.setError(errorMsg);
+                if (errorMsg.toLowerCase().contains("usuario")) {
+                    binding.usernameLayout.setError(errorMsg);
+                } else if (errorMsg.toLowerCase().contains("mail") || errorMsg.toLowerCase().contains("correo")) {
+                    binding.emailLayout.setError(errorMsg);
+                } else {
+                    android.widget.Toast.makeText(this, errorMsg, android.widget.Toast.LENGTH_LONG).show();
+                }
+            } else {
+                binding.usernameLayout.setError(null);
+                binding.emailLayout.setError(null);
             }
         });
 
@@ -42,16 +52,19 @@ public class RegisterActivity extends AppCompatActivity {
             String email = binding.emailText.getText().toString().trim();
             String password = binding.passwordText.getText().toString();
             String checkPassword = binding.checkPasswordText.getText().toString();
+            String username = binding.editTextUsername.getText().toString().trim();
 
-            if (email.isEmpty() || password.isEmpty() || checkPassword.isEmpty()) {
+            if (email.isEmpty() || password.isEmpty() || checkPassword.isEmpty() || username.isEmpty()) {
                 binding.emailLayout.setError(email.isEmpty() ? "Campo requerido" : null);
                 binding.passwordLayout.setError(password.isEmpty() ? "Campo requerido" : null);
                 binding.checkPasswordLayout.setError(checkPassword.isEmpty() ? "Campo requerido" : null);
+                binding.usernameLayout.setError(username.isEmpty() ? "Campo requerido" : null);
                 return;
             }
             binding.emailLayout.setError(null);
             binding.passwordLayout.setError(null);
             binding.checkPasswordLayout.setError(null);
+            binding.usernameLayout.setError(null);
 
             if (!password.equals(checkPassword)) {
                 binding.checkPasswordLayout.setError("Las contraseñas no coinciden");
@@ -60,7 +73,7 @@ public class RegisterActivity extends AppCompatActivity {
             binding.checkPasswordLayout.setError(null);
 
             // Registro usando el ViewModel
-            registerViewModel.registerUser(email, password);
+            registerViewModel.registerUser(username, email, password, checkPassword);
         });
 
         // Acción para volver al login con el enlace

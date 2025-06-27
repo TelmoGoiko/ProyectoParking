@@ -10,13 +10,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.Observer;
 
 import com.lksnext.parkingplantilla.R;
+import com.lksnext.parkingplantilla.viewmodel.RecoverPasswordViewModel;
 
 public class RecoverPasswordActivity extends AppCompatActivity {
     private EditText emailText;
     private Button btnRecover;
     private TextView backToLogin;
+
+    private RecoverPasswordViewModel recoverPasswordViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +32,25 @@ public class RecoverPasswordActivity extends AppCompatActivity {
         btnRecover = findViewById(R.id.btnRecover);
         backToLogin = findViewById(R.id.backToLogin);
 
+        recoverPasswordViewModel = new ViewModelProvider(this).get(RecoverPasswordViewModel.class);
+
+        recoverPasswordViewModel.getSuccess().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean success) {
+                if (success != null && success) {
+                    Toast.makeText(RecoverPasswordActivity.this, "Enlace de recuperación enviado", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        recoverPasswordViewModel.getError().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String error) {
+                if (error != null) {
+                    Toast.makeText(RecoverPasswordActivity.this, error, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         btnRecover.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -35,7 +59,7 @@ public class RecoverPasswordActivity extends AppCompatActivity {
                     Toast.makeText(RecoverPasswordActivity.this, "Introduce tu correo electrónico", Toast.LENGTH_SHORT).show();
                 } else {
                     // Aquí iría la lógica real de recuperación
-                    Toast.makeText(RecoverPasswordActivity.this, "Enlace de recuperación enviado (simulado)", Toast.LENGTH_SHORT).show();
+                    recoverPasswordViewModel.sendPasswordResetEmail(email);
                 }
             }
         });
