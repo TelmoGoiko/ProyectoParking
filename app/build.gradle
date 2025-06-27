@@ -3,8 +3,8 @@ apply plugin: 'androidx.navigation.safeargs'
 apply plugin: 'com.google.gms.google-services'
 
 android {
-    namespace "com.lksnext.parkingplantilla"
-    buildToolsVersion "35.0.0"
+    namespace 'com.lksnext.parkingplantilla'
+    // buildToolsVersion "35.0.0" // Optional, can be removed
     compileSdk 35
 
     defaultConfig {
@@ -25,7 +25,7 @@ android {
     }
 
     buildFeatures {
-        dataBinding = true
+        dataBinding true
         viewBinding true
     }
 
