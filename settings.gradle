@@ -1,2 +1,10 @@
+pluginManagement {
+    repositories {
+        // ¡Aquí es donde necesitamos google()!
+        google() // <-- Asegúrate de que esta línea esté presente
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
 rootProject.name = "ParkingPlantilla"
 include ':app'

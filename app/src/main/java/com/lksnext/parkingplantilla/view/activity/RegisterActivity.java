@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.lksnext.parkingplantilla.databinding.ActivityRegisterBinding;
 import com.lksnext.parkingplantilla.viewmodel.RegisterViewModel;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -22,6 +23,19 @@ public class RegisterActivity extends AppCompatActivity {
 
         //Asignamos el viewModel de register
         registerViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
+
+        // Observa el resultado del registro
+        registerViewModel.isRegistered().observe(this, isRegistered -> {
+            if (isRegistered == null) return;
+            if (isRegistered) {
+                finish(); // Cierra la pantalla y vuelve al login
+            }
+        });
+        registerViewModel.getErrorMessage().observe(this, errorMsg -> {
+            if (errorMsg != null) {
+                binding.emailLayout.setError(errorMsg);
+            }
+        });
 
         // Acción para el botón de registro
         binding.btnRegister.setOnClickListener(v -> {
@@ -45,15 +59,8 @@ public class RegisterActivity extends AppCompatActivity {
             }
             binding.checkPasswordLayout.setError(null);
 
-            // Lógica de registro (simulada)
+            // Registro usando el ViewModel
             registerViewModel.registerUser(email, password);
-        });
-
-        // Observa el resultado del registro
-        registerViewModel.isRegistered().observe(this, registered -> {
-            if (registered != null && registered) {
-                finish(); // Vuelve al login tras registro exitoso
-            }
         });
 
         // Acción para volver al login con el enlace

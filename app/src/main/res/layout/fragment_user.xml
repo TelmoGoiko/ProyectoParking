@@ -175,14 +175,16 @@
                 app:layout_constraintTop_toBottomOf="@id/cardViewInfo" />
             <Button
                 android:id="@+id/btnLogout"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/rounded_button_red"
-                android:text="Cerrar Sesión"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Cerrar sesión"
+                android:backgroundTint="#1976D2"
                 android:textColor="@android:color/white"
-                android:textSize="16sp"
-                app:layout_constraintTop_toBottomOf="@id/btnSave" />
+                app:layout_constraintTop_toBottomOf="@id/cardViewAvatar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginTop="32dp" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
