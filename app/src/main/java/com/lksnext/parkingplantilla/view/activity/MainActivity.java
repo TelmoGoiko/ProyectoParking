@@ -25,6 +25,10 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Set up the shared Toolbar as the ActionBar
+        setSupportActionBar(binding.mainToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.flFragment);
         // Obtener la referencia correcta al BottomNavigationView a través del binding
         BottomNavigationView bottomNavigationView = binding.bottomNavInclude.bottomNavigationView;

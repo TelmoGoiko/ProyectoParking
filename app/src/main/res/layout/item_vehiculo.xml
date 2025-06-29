@@ -59,6 +59,19 @@
             app:layout_constraintTop_toBottomOf="@+id/tvMarcaModelo"
             tools:text="Coche" />
 
+        <TextView
+            android:id="@+id/tvElectric"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="14sp"
+            android:textColor="#388E3C"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTipoVehiculo"
+            tools:text="Eléctrico" />
+
         <ImageButton
             android:id="@+id/btnEditarVehiculo"
             android:layout_width="wrap_content"

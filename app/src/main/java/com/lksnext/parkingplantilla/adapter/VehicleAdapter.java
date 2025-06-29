@@ -65,6 +65,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
         private TextView tvMatricula;
         private TextView tvMarcaModelo;
         private TextView tvTipoVehiculo;
+        private TextView tvElectric;
         private ImageButton btnEditarVehiculo;
         private ImageButton btnBorrarVehiculo;
 
@@ -74,6 +75,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             tvMatricula = itemView.findViewById(R.id.tvMatricula);
             tvMarcaModelo = itemView.findViewById(R.id.tvMarcaModelo);
             tvTipoVehiculo = itemView.findViewById(R.id.tvTipoVehiculo);
+            tvElectric = itemView.findViewById(R.id.tvElectric);
             btnEditarVehiculo = itemView.findViewById(R.id.btnEditarVehiculo);
             btnBorrarVehiculo = itemView.findViewById(R.id.btnBorrarVehiculo);
 
@@ -104,6 +106,11 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             tvMatricula.setText(vehicle.getLicensePlate());
             tvMarcaModelo.setText(vehicle.getBrand() + " " + vehicle.getModel());
             tvTipoVehiculo.setText(vehicle.getType().getDisplayName());
+            if (vehicle.isElectric()) {
+                tvElectric.setVisibility(View.VISIBLE);
+            } else {
+                tvElectric.setVisibility(View.GONE);
+            }
         }
     }
 }

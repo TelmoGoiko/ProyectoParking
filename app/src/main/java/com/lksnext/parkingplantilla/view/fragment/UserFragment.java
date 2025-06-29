@@ -9,7 +9,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,13 +31,13 @@ public class UserFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // Configurar Toolbar con botón de retroceso
-        Toolbar toolbar = binding.toolbarUser;
-        if (toolbar != null) {
-            ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
-            toolbar.setNavigationOnClickListener(v -> requireActivity().onBackPressed());
+        // Use the shared Toolbar from MainActivity
+        AppCompatActivity activity = (AppCompatActivity) requireActivity();
+        if (activity.getSupportActionBar() != null) {
+            activity.getSupportActionBar().setTitle("Perfil de Usuario");
+            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-
+        requireActivity().findViewById(com.lksnext.parkingplantilla.R.id.mainToolbar).setOnClickListener(v -> requireActivity().onBackPressed());
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         profileViewModel.loadUserData();
 

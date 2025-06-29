@@ -13,6 +13,7 @@ public class Vehicle implements Serializable {
     private String brand;
     private String model;
     private VehicleType type;
+    private boolean electric;
 
     // Enum para tipos de vehículo
     public enum VehicleType {
@@ -36,13 +37,14 @@ public class Vehicle implements Serializable {
     }
 
     // Constructor completo
-    public Vehicle(String id, String name, String licensePlate, String brand, String model, VehicleType type) {
+    public Vehicle(String id, String name, String licensePlate, String brand, String model, VehicleType type, boolean electric) {
         this.id = id;
         this.name = name;
         this.licensePlate = licensePlate;
         this.brand = brand;
         this.model = model;
         this.type = type;
+        this.electric = electric;
     }
 
     // Getters y setters
@@ -92,6 +94,14 @@ public class Vehicle implements Serializable {
 
     public void setType(VehicleType type) {
         this.type = type;
+    }
+
+    public boolean isElectric() {
+        return electric;
+    }
+
+    public void setElectric(boolean electric) {
+        this.electric = electric;
     }
 
     @Override

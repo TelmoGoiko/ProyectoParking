@@ -7,9 +7,11 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.lksnext.parkingplantilla.R;
 import com.lksnext.parkingplantilla.adapter.ReservasAdapter;
 import com.lksnext.parkingplantilla.databinding.FragmentMisReservasBinding;
 import com.lksnext.parkingplantilla.model.Reserva;
@@ -32,11 +34,16 @@ public class MisReservasFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // Use the shared Toolbar from MainActivity
+        AppCompatActivity activity = (AppCompatActivity) requireActivity();
+        if (activity.getSupportActionBar() != null) {
+            activity.getSupportActionBar().setTitle("Mis Reservas");
+            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        requireActivity().findViewById(R.id.mainToolbar).setOnClickListener(v -> requireActivity().onBackPressed());
         // Configurar el RecyclerView
         binding.recyclerViewReservas.setLayoutManager(new LinearLayoutManager(getContext()));
         cargarDatosDePrueba();
-        // El botón de volver puede ocultarse o usarse para navegación interna
-        binding.btnVolver.setVisibility(View.GONE);
     }
 
     private void cargarDatosDePrueba() {

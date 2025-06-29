@@ -1,44 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:padding="24dp"
     android:background="@android:color/white">
 
-    <TextView
-        android:id="@+id/tvTituloAparcar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Aparcar Ya"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:textColor="#1976D2"
-        android:layout_marginBottom="24dp" />
-
-    <Button
-        android:id="@+id/btnSeleccionarFecha"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Seleccionar fecha"
-        android:drawableLeft="@android:drawable/ic_menu_my_calendar"
-        android:layout_marginBottom="16dp" />
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:gravity="center_horizontal">
 
-    <Button
-        android:id="@+id/btnSeleccionarHora"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Seleccionar hora"
-        android:drawableLeft="@android:drawable/ic_menu_recent_history"
-        android:layout_marginBottom="32dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Selecciona la fecha y hora de salida para tu aparcamiento."
+                android:textColor="#1976D2"
+                android:textSize="16sp"
+                android:layout_marginBottom="16dp" />
 
-    <Button
-        android:id="@+id/btnAparcar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Buscar plaza disponible"
-        android:backgroundTint="#1976D2"
-        android:textColor="@android:color/white" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fecha de salida"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp" />
+            <DatePicker
+                android:id="@+id/datePickerSalida"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:calendarViewShown="true" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hora de salida"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp" />
+            <TimePicker
+                android:id="@+id/timePickerSalida"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
+            <Button
+                android:id="@+id/btnContinuarAparcarYa"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Continuar"
+                android:backgroundTint="#1976D2"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="24dp" />
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

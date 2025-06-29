@@ -86,14 +86,14 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Botón Reservar -->
+    <!-- Botón Reservar (único) -->
     <androidx.cardview.widget.CardView
         android:id="@+id/btnReservar"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:cardCornerRadius="12dp"
         app:cardElevation="4dp"
-        app:cardBackgroundColor="#FF6E40"
+        app:cardBackgroundColor="#1976D2"
         app:layout_constraintTop_toBottomOf="@id/logoContainer"
         app:layout_constraintBottom_toTopOf="@id/guidelineHorizontal50"
         app:layout_constraintStart_toStartOf="@id/guidelineVertical50"

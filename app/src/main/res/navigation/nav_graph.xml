@@ -33,7 +33,11 @@
         android:id="@+id/misVehiculosFragment"
         android:name="com.lksnext.parkingplantilla.view.fragment.MisVehiculosFragment"
         android:label="Mis Vehículos"
-        tools:layout="@layout/fragment_mis_vehiculos" />
+        tools:layout="@layout/fragment_mis_vehiculos">
+        <action
+            android:id="@+id/action_misVehiculosFragment_to_anadirEditarVehiculoFragment"
+            app:destination="@id/anadirEditarVehiculoFragment" />
+    </fragment>
     <fragment
         android:id="@+id/elegirReservaFragment"
         android:name="com.lksnext.parkingplantilla.view.fragment.ElegirReservaFragment"
@@ -46,5 +50,10 @@
             android:id="@+id/action_elegirReservaFragment_to_aparcarYaFragment"
             app:destination="@id/aparcarYaFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/anadirEditarVehiculoFragment"
+        android:name="com.lksnext.parkingplantilla.view.fragment.AnadirEditarVehiculoFragment"
+        android:label="Añadir/Editar Vehículo"
+        tools:layout="@layout/fragment_anadir_editar_vehiculo" />
 
 </navigation>
