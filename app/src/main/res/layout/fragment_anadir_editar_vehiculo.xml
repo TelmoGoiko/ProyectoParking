@@ -44,23 +44,22 @@
                 android:inputType="text"
                 android:layout_marginBottom="12dp" />
 
-            <EditText
-                android:id="@+id/etMarca"
+            <Spinner
+                android:id="@+id/spinnerMarca"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Marca"
-                android:inputType="text"
                 android:layout_marginBottom="12dp" />
 
-            <EditText
-                android:id="@+id/etModelo"
+            <Spinner
+                android:id="@+id/spinnerModelo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Modelo"
-                android:inputType="text"
                 android:layout_marginBottom="12dp" />
 
             <LinearLayout
+                android:id="@+id/layoutElectric"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -74,6 +73,25 @@
                     android:layout_marginEnd="12dp" />
                 <Switch
                     android:id="@+id/switchElectric"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutMinusvalidos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="¿Para minusválidos?"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="12dp" />
+                <Switch
+                    android:id="@+id/switchMinusvalidos"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>

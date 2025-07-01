@@ -14,12 +14,12 @@ public class Vehicle implements Serializable {
     private String model;
     private VehicleType type;
     private boolean electric;
+    private boolean forDisabled;
 
     // Enum para tipos de vehículo
     public enum VehicleType {
         CAR("Coche"),
-        MOTORCYCLE("Moto"),
-        VAN("Furgoneta");
+        MOTORCYCLE("Moto");
 
         private final String displayName;
 
@@ -37,7 +37,7 @@ public class Vehicle implements Serializable {
     }
 
     // Constructor completo
-    public Vehicle(String id, String name, String licensePlate, String brand, String model, VehicleType type, boolean electric) {
+    public Vehicle(String id, String name, String licensePlate, String brand, String model, VehicleType type, boolean electric, boolean forDisabled) {
         this.id = id;
         this.name = name;
         this.licensePlate = licensePlate;
@@ -45,6 +45,7 @@ public class Vehicle implements Serializable {
         this.model = model;
         this.type = type;
         this.electric = electric;
+        this.forDisabled = forDisabled;
     }
 
     // Getters y setters
@@ -102,6 +103,14 @@ public class Vehicle implements Serializable {
 
     public void setElectric(boolean electric) {
         this.electric = electric;
+    }
+
+    public boolean isForDisabled() {
+        return forDisabled;
+    }
+
+    public void setForDisabled(boolean forDisabled) {
+        this.forDisabled = forDisabled;
     }
 
     @Override
