@@ -14,14 +14,25 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
+        <ImageView
+            android:id="@+id/ivVehiculoIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_vehicles_foreground"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/tvTipoVehiculo"/>
+
         <TextView
             android:id="@+id/tvVehiculoNombre"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:layout_marginStart="16dp"
             app:layout_constraintEnd_toStartOf="@+id/btnEditarVehiculo"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/ivVehiculoIcon"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Mi Coche" />
 
@@ -32,7 +43,7 @@
             android:layout_marginTop="4dp"
             android:textSize="16sp"
             app:layout_constraintEnd_toStartOf="@+id/btnEditarVehiculo"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/tvVehiculoNombre"
             app:layout_constraintTop_toBottomOf="@+id/tvVehiculoNombre"
             tools:text="1234ABC" />
 
@@ -43,7 +54,7 @@
             android:layout_marginTop="4dp"
             android:textSize="14sp"
             app:layout_constraintEnd_toStartOf="@+id/btnEditarVehiculo"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/tvVehiculoNombre"
             app:layout_constraintTop_toBottomOf="@+id/tvMatricula"
             tools:text="Seat León" />
 
@@ -55,7 +66,7 @@
             android:textSize="14sp"
             android:textStyle="italic"
             app:layout_constraintEnd_toStartOf="@+id/btnEditarVehiculo"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/tvVehiculoNombre"
             app:layout_constraintTop_toBottomOf="@+id/tvMarcaModelo"
             tools:text="Coche" />
 

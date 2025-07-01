@@ -13,14 +13,24 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
+        <ImageView
+            android:id="@+id/ivReservaIcon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_parking_history"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/tvNombreParking"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ivReservaIcon"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Parking Centro" />
 
@@ -31,7 +41,7 @@
             android:layout_marginTop="8dp"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/tvNombreParking"
             app:layout_constraintTop_toBottomOf="@id/tvNombreParking"
             tools:text="12/06/2025" />
 
@@ -42,7 +52,7 @@
             android:layout_marginTop="8dp"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/tvNombreParking"
             app:layout_constraintTop_toBottomOf="@id/tvFecha"
             tools:text="14:00 - 16:00" />
 

@@ -18,12 +18,20 @@
         android:id="@+id/aparcarYaFragment"
         android:name="com.lksnext.parkingplantilla.view.fragment.AparcarYaFragment"
         android:label="Aparcar Ya"
-        tools:layout="@layout/fragment_aparcar_ya" />
+        tools:layout="@layout/fragment_aparcar_ya">
+        <action
+            android:id="@+id/action_aparcarYaFragment_to_seleccionVehiculoFragment"
+            app:destination="@id/seleccionVehiculoFragment" />
+    </fragment>
     <fragment
         android:id="@+id/reservarFragment"
         android:name="com.lksnext.parkingplantilla.view.fragment.ReservarFragment"
         android:label="Reservar"
-        tools:layout="@layout/fragment_reservar" />
+        tools:layout="@layout/fragment_reservar">
+        <action
+            android:id="@+id/action_reservarFragment_to_seleccionVehiculoFragment"
+            app:destination="@id/seleccionVehiculoFragment" />
+    </fragment>
     <fragment
         android:id="@+id/misReservasFragment"
         android:name="com.lksnext.parkingplantilla.view.fragment.MisReservasFragment"
