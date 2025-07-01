@@ -6,9 +6,13 @@ import com.google.firebase.auth.AuthResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import androidx.annotation.NonNull;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import androidx.annotation.Nullable;
 import com.lksnext.parkingplantilla.model.Vehicle;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,42 +52,49 @@ public class DataRepository {
             });
     }
 
-    // Guardar vehículo en Firebase
+    // Guardar vehículo en Firestore
     public void addVehicle(String userId, Vehicle vehicle, Callback callback) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
-                .child("usuarios").child(userId).child("vehiculos").child(vehicle.getId());
-        ref.setValue(vehicle)
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").document(userId)
+            .collection("vehiculos").document(vehicle.getId())
+            .set(vehicle)
             .addOnSuccessListener(aVoid -> callback.onSuccess())
-            .addOnFailureListener(e -> callback.onFailure());
+            .addOnFailureListener(e -> {
+                android.util.Log.e("FIRESTORE_ERROR", "Error al guardar vehículo", e);
+                callback.onFailure();
+            });
     }
 
-    // Leer vehículos del usuario en Firebase
+    // Leer vehículos del usuario en Firestore
     public void getVehicles(String userId, MutableLiveData<List<Vehicle>> liveData) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
-                .child("usuarios").child(userId).child("vehiculos");
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").document(userId)
+            .collection("vehiculos")
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
                 List<Vehicle> vehicles = new ArrayList<>();
-                for (DataSnapshot child : snapshot.getChildren()) {
-                    Vehicle v = child.getValue(Vehicle.class);
+                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                    Vehicle v = doc.toObject(Vehicle.class);
                     if (v != null) vehicles.add(v);
                 }
                 liveData.postValue(vehicles);
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            })
+            .addOnFailureListener(e -> {
+                android.util.Log.e("FIRESTORE_ERROR", "Error al leer vehículos", e);
                 liveData.postValue(new ArrayList<>());
-            }
-        });
+            });
     }
 
-    // Eliminar vehículo en Firebase
+    // Eliminar vehículo en Firestore
     public void deleteVehicle(String userId, String vehicleId, Callback callback) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
-                .child("usuarios").child(userId).child("vehiculos").child(vehicleId);
-        ref.removeValue()
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").document(userId)
+            .collection("vehiculos").document(vehicleId)
+            .delete()
             .addOnSuccessListener(aVoid -> callback.onSuccess())
-            .addOnFailureListener(e -> callback.onFailure());
+            .addOnFailureListener(e -> {
+                android.util.Log.e("FIRESTORE_ERROR", "Error al eliminar vehículo", e);
+                callback.onFailure();
+            });
     }
 }

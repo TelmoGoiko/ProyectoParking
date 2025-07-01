@@ -460,6 +460,12 @@ public class AnadirEditarVehiculoFragment extends Fragment {
         boolean isElectric = binding.switchElectric.isChecked();
         boolean isForDisabled = binding.switchMinusvalidos.isChecked();
 
+        // Validar formato de matrícula española: 4 números y 3 letras mayúsculas sin vocales
+        if (!matricula.matches("^[0-9]{4}[B-DF-HJ-NP-TV-Z]{3}$")) {
+            Toast.makeText(getContext(), "Matrícula no válida. Debe tener 4 números y 3 consonantes mayúsculas (ej: 1234BCD)", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (TextUtils.isEmpty(nombre) || TextUtils.isEmpty(matricula) || TextUtils.isEmpty(marca) || TextUtils.isEmpty(modelo)) {
             Toast.makeText(getContext(), "Completa todos los campos", Toast.LENGTH_SHORT).show();
             return;
@@ -469,17 +475,38 @@ public class AnadirEditarVehiculoFragment extends Fragment {
         String id = (vehicleToEdit != null) ? vehicleToEdit.getId() : UUID.randomUUID().toString();
         Vehicle vehiculo = new Vehicle(id, nombre, matricula, marca, modelo, tipo, isElectric, isForDisabled);
 
-        viewModel.addVehicle(userId, vehiculo, new Callback() {
-            @Override
-            public void onSuccess() {
-                Toast.makeText(getContext(), "Vehículo guardado", Toast.LENGTH_SHORT).show();
-                requireActivity().onBackPressed();
-            }
-            @Override
-            public void onFailure() {
-                Toast.makeText(getContext(), "Error al guardar", Toast.LENGTH_SHORT).show();
-            }
-        });
+        // Comprobar si ya existe una matrícula igual en la base de datos (solo en los vehículos del usuario actual)
+        com.google.firebase.firestore.FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
+        db.collection("users").document(userId).collection("vehiculos")
+            .whereEqualTo("licensePlate", matricula)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                boolean existe = false;
+                for (com.google.firebase.firestore.QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                    // Si estamos editando, permitir la misma matrícula solo si es el mismo vehículo
+                    if (vehicleToEdit != null && doc.getId().equals(vehicleToEdit.getId())) continue;
+                    existe = true;
+                    break;
+                }
+                if (existe) {
+                    Toast.makeText(getContext(), "Ya existe un vehículo con esa matrícula", Toast.LENGTH_SHORT).show();
+                } else {
+                    viewModel.addVehicle(userId, vehiculo, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            Toast.makeText(getContext(), "Vehículo guardado", Toast.LENGTH_SHORT).show();
+                            requireActivity().onBackPressed();
+                        }
+                        @Override
+                        public void onFailure() {
+                            Toast.makeText(getContext(), "Error al guardar", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(getContext(), "Error comprobando matrícula: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
     }
 
     @Override

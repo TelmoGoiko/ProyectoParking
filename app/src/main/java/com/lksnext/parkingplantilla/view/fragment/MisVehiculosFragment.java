@@ -62,12 +62,19 @@ public class MisVehiculosFragment extends Fragment implements VehicleAdapter.OnV
         });
     }
 
+    private void recargarVehiculos() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        viewModel.loadVehicles(userId);
+    }
+
     @Override
     public void onVehicleClick(Vehicle vehicle) {
         Bundle args = new Bundle();
         args.putSerializable("vehicle", vehicle);
         Navigation.findNavController(requireView()).navigate(
             com.lksnext.parkingplantilla.R.id.action_misVehiculosFragment_to_anadirEditarVehiculoFragment, args);
+        // Recargar al volver de editar
+        requireActivity().getSupportFragmentManager().addOnBackStackChangedListener(() -> recargarVehiculos());
     }
 
     @Override
@@ -76,6 +83,8 @@ public class MisVehiculosFragment extends Fragment implements VehicleAdapter.OnV
         args.putSerializable("vehicle", vehicle);
         Navigation.findNavController(requireView()).navigate(
             com.lksnext.parkingplantilla.R.id.action_misVehiculosFragment_to_anadirEditarVehiculoFragment, args);
+        // Recargar al volver de editar
+        requireActivity().getSupportFragmentManager().addOnBackStackChangedListener(() -> recargarVehiculos());
     }
 
     public void onDeleteClick(Vehicle vehicle) {
@@ -90,10 +99,12 @@ public class MisVehiculosFragment extends Fragment implements VehicleAdapter.OnV
             @Override
             public void onSuccess() {
                 Toast.makeText(getContext(), "Vehículo eliminado", Toast.LENGTH_SHORT).show();
+                recargarVehiculos();
             }
             @Override
             public void onFailure() {
                 Toast.makeText(getContext(), "Error al eliminar", Toast.LENGTH_SHORT).show();
+                recargarVehiculos();
             }
         });
     }
