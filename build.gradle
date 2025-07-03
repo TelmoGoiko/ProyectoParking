@@ -19,10 +19,6 @@ sonarqube {
         property "sonar.projectKey", "TelmoGoiko_ProyectoParking"
         property "sonar.organization", "telmogoiko-1"
         property "sonar.host.url", "https://sonarcloud.io"
-        // Read token from environment if available
-        if (System.getenv("SONAR_TOKEN") != null) {
-            property "sonar.login", System.getenv("SONAR_TOKEN")
-        }
     }
 }
 
