@@ -25,7 +25,7 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-      - name: Dar permisos de ejecución a gradlew
+      - name: Give execute permission to gradlew
         run: chmod +x ./gradlew
       - name: Cache Gradle packages
         uses: actions/cache@v4
