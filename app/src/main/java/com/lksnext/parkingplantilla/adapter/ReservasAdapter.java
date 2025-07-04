@@ -22,7 +22,7 @@ public class ReservasAdapter extends RecyclerView.Adapter<ReservasAdapter.Reserv
     }
 
     public interface OnReservaDeleteClickListener {
-        void onDeleteClick(Reserva reserva);
+        boolean onDeleteClick(Reserva reserva);
     }
 
     public ReservasAdapter(List<Reserva> reservas, OnReservaEditClickListener editListener, OnReservaDeleteClickListener deleteListener) {

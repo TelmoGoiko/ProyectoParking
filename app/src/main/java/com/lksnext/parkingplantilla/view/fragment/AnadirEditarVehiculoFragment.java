@@ -19,7 +19,6 @@ import com.lksnext.parkingplantilla.databinding.FragmentAnadirEditarVehiculoBind
 import com.lksnext.parkingplantilla.model.Vehicle;
 import com.lksnext.parkingplantilla.viewmodel.MainViewModel;
 import com.lksnext.parkingplantilla.domain.Callback;
-import com.google.firebase.auth.FirebaseAuth;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -471,42 +470,21 @@ public class AnadirEditarVehiculoFragment extends Fragment {
             return;
         }
 
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         String id = (vehicleToEdit != null) ? vehicleToEdit.getId() : UUID.randomUUID().toString();
         Vehicle vehiculo = new Vehicle(id, nombre, matricula, marca, modelo, tipo, isElectric, isForDisabled);
 
-        // Comprobar si ya existe una matrícula igual en la base de datos (solo en los vehículos del usuario actual)
-        com.google.firebase.firestore.FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
-        db.collection("users").document(userId).collection("vehiculos")
-            .whereEqualTo("licensePlate", matricula)
-            .get()
-            .addOnSuccessListener(queryDocumentSnapshots -> {
-                boolean existe = false;
-                for (com.google.firebase.firestore.QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                    // Si estamos editando, permitir la misma matrícula solo si es el mismo vehículo
-                    if (vehicleToEdit != null && doc.getId().equals(vehicleToEdit.getId())) continue;
-                    existe = true;
-                    break;
-                }
-                if (existe) {
-                    Toast.makeText(getContext(), "Ya existe un vehículo con esa matrícula", Toast.LENGTH_SHORT).show();
-                } else {
-                    viewModel.addVehicle(userId, vehiculo, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Toast.makeText(getContext(), "Vehículo guardado", Toast.LENGTH_SHORT).show();
-                            requireActivity().onBackPressed();
-                        }
-                        @Override
-                        public void onFailure() {
-                            Toast.makeText(getContext(), "Error al guardar", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            })
-            .addOnFailureListener(e -> {
-                Toast.makeText(getContext(), "Error comprobando matrícula: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            });
+        // Delegar toda la lógica de guardado al ViewModel (que a su vez delega al DataRepository)
+        viewModel.addOrUpdateVehicle(vehiculo, vehicleToEdit != null, new Callback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(getContext(), "Vehículo guardado", Toast.LENGTH_SHORT).show();
+                requireActivity().onBackPressed();
+            }
+            @Override
+            public void onFailure() {
+                Toast.makeText(getContext(), "Error al guardar vehículo", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

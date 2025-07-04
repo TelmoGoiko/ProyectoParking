@@ -29,4 +29,12 @@ public class MainViewModel extends ViewModel {
     public void deleteVehicle(String userId, String vehicleId, Callback callback) {
         repository.deleteVehicle(userId, vehicleId, callback);
     }
+
+    public void addOrUpdateVehicle(Vehicle vehicle, boolean isEdit, Callback callback) {
+        repository.addOrUpdateVehicle(vehicle, isEdit, callback);
+    }
+
+    public String getCurrentUserId() {
+        return repository.getCurrentUserId();
+    }
 }

@@ -3,33 +3,43 @@ package com.lksnext.parkingplantilla.data;
 import com.lksnext.parkingplantilla.domain.Callback;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import androidx.annotation.NonNull;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import androidx.annotation.Nullable;
+import com.google.firebase.auth.FirebaseUser;
 import com.lksnext.parkingplantilla.model.Vehicle;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import java.util.Map;
 import androidx.lifecycle.MutableLiveData;
 
 public class DataRepository {
 
     private static DataRepository instance;
     private final FirebaseAuth firebaseAuth;
+    private final FirebaseFirestore firestore;
+
+    private final String users = "users";
+    private final String vehicles = "vehiculos";
+
+    private final String FIRESTORE_ERROR = "FIRESTORE_ERROR";
+    
+    // Reservas
+    private final String reservas = "reservas";
+
 
     private DataRepository(){
         firebaseAuth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance();
     }
 
-    //Creación de la instancia en caso de que no exista.
+    // Creación de la instancia en caso de que no exista.
     public static synchronized DataRepository getInstance(){
         if (instance==null){
             instance = new DataRepository();
@@ -37,7 +47,7 @@ public class DataRepository {
         return instance;
     }
 
-    //Petición del login.
+    // Petición del login.
     public void login(String email, String pass, Callback callback){
         firebaseAuth.signInWithEmailAndPassword(email, pass)
             .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -52,49 +62,388 @@ public class DataRepository {
             });
     }
 
+    // Google Sign-In Authentication
+    public void firebaseAuthWithGoogle(GoogleSignInAccount account, Callback callback) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+        firebaseAuth.signInWithCredential(credential)
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                    if (user != null) {
+                        saveUserToFirestore(user);
+                    }
+                    callback.onSuccess();
+                } else {
+                    callback.onFailure();
+                }
+            });
+    }
+
+    // Save user to Firestore if new
+    private void saveUserToFirestore(FirebaseUser user) {
+        firestore.collection(users).document(user.getUid()).get()
+            .addOnSuccessListener(doc -> {
+                if (!doc.exists()) {
+                    // New user, save data
+                    String username = user.getDisplayName() != null ?
+                        user.getDisplayName() : user.getEmail().split("@")[0];
+
+                    Map<String, Object> userData = new HashMap<>();
+                    userData.put("username", username);
+                    userData.put("email", user.getEmail());
+                    userData.put("uid", user.getUid());
+
+                    firestore.collection(users).document(user.getUid()).set(userData);
+                }
+            });
+    }
+
+    // Password reset
+    public void sendPasswordResetEmail(String email, Callback callback) {
+        firebaseAuth.sendPasswordResetEmail(email)
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    callback.onSuccess();
+                } else {
+                    callback.onFailure();
+                }
+            });
+    }
+
     // Guardar vehículo en Firestore
     public void addVehicle(String userId, Vehicle vehicle, Callback callback) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users").document(userId)
-            .collection("vehiculos").document(vehicle.getId())
+        firestore.collection(users).document(userId)
+            .collection(vehicles).document(vehicle.getId())
             .set(vehicle)
             .addOnSuccessListener(aVoid -> callback.onSuccess())
             .addOnFailureListener(e -> {
-                android.util.Log.e("FIRESTORE_ERROR", "Error al guardar vehículo", e);
+                android.util.Log.e(FIRESTORE_ERROR, "Error al guardar vehículo", e);
                 callback.onFailure();
             });
     }
 
     // Leer vehículos del usuario en Firestore
     public void getVehicles(String userId, MutableLiveData<List<Vehicle>> liveData) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users").document(userId)
-            .collection("vehiculos")
+        firestore.collection(users).document(userId)
+            .collection(vehicles)
             .get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 List<Vehicle> vehicles = new ArrayList<>();
                 for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                     Vehicle v = doc.toObject(Vehicle.class);
-                    if (v != null) vehicles.add(v);
+                    vehicles.add(v);
                 }
                 liveData.postValue(vehicles);
             })
             .addOnFailureListener(e -> {
-                android.util.Log.e("FIRESTORE_ERROR", "Error al leer vehículos", e);
+                android.util.Log.e(FIRESTORE_ERROR, "Error al leer vehículos", e);
                 liveData.postValue(new ArrayList<>());
             });
     }
 
     // Eliminar vehículo en Firestore
     public void deleteVehicle(String userId, String vehicleId, Callback callback) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users").document(userId)
-            .collection("vehiculos").document(vehicleId)
+        firestore.collection(users).document(userId)
+            .collection(vehicles).document(vehicleId)
             .delete()
             .addOnSuccessListener(aVoid -> callback.onSuccess())
             .addOnFailureListener(e -> {
-                android.util.Log.e("FIRESTORE_ERROR", "Error al eliminar vehículo", e);
+                android.util.Log.e(FIRESTORE_ERROR, "Error al eliminar vehículo", e);
                 callback.onFailure();
+            });
+    }
+
+    // Find user by username
+    public void findUserByUsername(String username, Callback callback, MutableLiveData<String> emailResult) {
+        firestore.collection(users)
+            .whereEqualTo("username", username)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                if (!queryDocumentSnapshots.isEmpty() && !queryDocumentSnapshots.getDocuments().isEmpty()) {
+                    String email = queryDocumentSnapshots.getDocuments().get(0).getString("email");
+                    if (email != null) {
+                        emailResult.setValue(email);
+                        callback.onSuccess();
+                    } else {
+                        callback.onFailure();
+                    }
+                } else {
+                    callback.onFailure();
+                }
+            })
+            .addOnFailureListener(e -> callback.onFailure());
+    }
+
+    // Check if username exists
+    public void checkUsernameExists(String username, Callback callback) {
+        firestore.collection(users)
+            .whereEqualTo("username", username)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                if (!queryDocumentSnapshots.isEmpty()) {
+                    callback.onFailure(); // Username exists, so registration should fail
+                } else {
+                    callback.onSuccess(); // Username doesn't exist, can proceed
+                }
+            })
+            .addOnFailureListener(e -> callback.onFailure());
+    }
+
+    // Register user with email and password
+    public void registerUser(String username, String email, String password, Callback callback) {
+        firebaseAuth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    String uid = firebaseAuth.getCurrentUser().getUid();
+                    Map<String, Object> userMap = new HashMap<>();
+                    userMap.put("username", username);
+                    userMap.put("email", email);
+                    userMap.put("uid", uid);
+                    firestore.collection(users).document(uid).set(userMap)
+                        .addOnSuccessListener(aVoid -> callback.onSuccess())
+                        .addOnFailureListener(e -> callback.onFailure());
+                } else {
+                    callback.onFailure();
+                }
+            });
+    }
+
+    // Crear una nueva reserva
+    public void createReserva(String userId, com.lksnext.parkingplantilla.domain.Reserva reserva, Callback callback) {
+        if (reserva.getId() == null || reserva.getId().isEmpty()) {
+            reserva.setId(firestore.collection(reservas).document().getId());
+        }
+
+        firestore.collection(users).document(userId)
+            .collection(reservas).document(reserva.getId())
+            .set(reserva)
+            .addOnSuccessListener(aVoid -> callback.onSuccess())
+            .addOnFailureListener(e -> {
+                android.util.Log.e(FIRESTORE_ERROR, "Error al guardar reserva", e);
+                callback.onFailure();
+            });
+    }
+
+    // Obtener todas las reservas de un usuario
+    public void getReservasByUser(String userId, MutableLiveData<List<com.lksnext.parkingplantilla.domain.Reserva>> liveData) {
+        firestore.collection(users).document(userId)
+            .collection(reservas)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                List<com.lksnext.parkingplantilla.domain.Reserva> reservasList = new ArrayList<>();
+                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                    com.lksnext.parkingplantilla.domain.Reserva reserva = doc.toObject(com.lksnext.parkingplantilla.domain.Reserva.class);
+                    if (reserva != null) reservasList.add(reserva);
+                }
+                liveData.postValue(reservasList);
+            })
+            .addOnFailureListener(e -> {
+                android.util.Log.e(FIRESTORE_ERROR, "Error al obtener reservas", e);
+                liveData.postValue(new ArrayList<>());
+            });
+    }
+
+    // Obtener una reserva específica
+    public void getReservaById(String userId, String reservaId, MutableLiveData<com.lksnext.parkingplantilla.domain.Reserva> liveData) {
+        firestore.collection(users).document(userId)
+            .collection(reservas).document(reservaId)
+            .get()
+            .addOnSuccessListener(documentSnapshot -> {
+                com.lksnext.parkingplantilla.domain.Reserva reserva = documentSnapshot.toObject(com.lksnext.parkingplantilla.domain.Reserva.class);
+                liveData.postValue(reserva);
+            })
+            .addOnFailureListener(e -> {
+                android.util.Log.e(FIRESTORE_ERROR, "Error al obtener reserva", e);
+                liveData.postValue(null);
+            });
+    }
+
+    // Actualizar una reserva existente
+    public void updateReserva(String userId, com.lksnext.parkingplantilla.domain.Reserva reserva, Callback callback) {
+        firestore.collection(users).document(userId)
+            .collection(reservas).document(reserva.getId())
+            .set(reserva)
+            .addOnSuccessListener(aVoid -> callback.onSuccess())
+            .addOnFailureListener(e -> {
+                android.util.Log.e(FIRESTORE_ERROR, "Error al actualizar reserva", e);
+                callback.onFailure();
+            });
+    }
+
+    // Eliminar una reserva
+    public void deleteReserva(String userId, String reservaId, Callback callback) {
+        firestore.collection(users).document(userId)
+            .collection(reservas).document(reservaId)
+            .delete()
+            .addOnSuccessListener(aVoid -> callback.onSuccess())
+            .addOnFailureListener(e -> {
+                android.util.Log.e(FIRESTORE_ERROR, "Error al eliminar reserva", e);
+                callback.onFailure();
+            });
+    }
+
+    // Obtener plazas disponibles
+    public void getAvailablePlazas(String fecha, com.lksnext.parkingplantilla.domain.Hora hora, MutableLiveData<List<com.lksnext.parkingplantilla.domain.Plaza>> liveData) {
+        // Simular plazas disponibles (esto debería consultarse en Firebase)
+        List<com.lksnext.parkingplantilla.domain.Plaza> plazas = new ArrayList<>();
+        for (int i = 1; i <= 10; i++) {
+            plazas.add(new com.lksnext.parkingplantilla.domain.Plaza(i, "normal"));
+        }
+        for (int i = 11; i <= 15; i++) {
+            plazas.add(new com.lksnext.parkingplantilla.domain.Plaza(i, "discapacitados"));
+        }
+        for (int i = 16; i <= 20; i++) {
+            plazas.add(new com.lksnext.parkingplantilla.domain.Plaza(i, "eléctricos"));
+        }
+
+        // Buscar reservas existentes para esa fecha y hora
+        firestore.collectionGroup(reservas)
+            .whereEqualTo("fecha", fecha)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                List<com.lksnext.parkingplantilla.domain.Reserva> reservasExistentes = new ArrayList<>();
+                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                    com.lksnext.parkingplantilla.domain.Reserva reserva = doc.toObject(com.lksnext.parkingplantilla.domain.Reserva.class);
+                    if (reserva != null) {
+                        // Comprobar si hay solapamiento de horas
+                        com.lksnext.parkingplantilla.domain.Hora horaReserva = reserva.getHoraInicio();
+                        if (horaReserva != null) {
+                            if ((horaReserva.getHoraInicio() <= hora.getHoraInicio() &&
+                                 horaReserva.getHoraFin() > hora.getHoraInicio()) ||
+                                (horaReserva.getHoraInicio() < hora.getHoraFin() &&
+                                 horaReserva.getHoraFin() >= hora.getHoraFin()) ||
+                                (horaReserva.getHoraInicio() >= hora.getHoraInicio() &&
+                                 horaReserva.getHoraFin() <= hora.getHoraFin())) {
+                                reservasExistentes.add(reserva);
+                            }
+                        }
+                    }
+                }
+
+                // Filtrar las plazas que ya están reservadas
+                for (com.lksnext.parkingplantilla.domain.Reserva reserva : reservasExistentes) {
+                    com.lksnext.parkingplantilla.domain.Plaza plazaReservada = reserva.getPlazaId();
+                    if (plazaReservada != null) {
+                        plazas.removeIf(plaza -> plaza.getId() == plazaReservada.getId());
+                    }
+                }
+
+                liveData.postValue(plazas);
+            })
+            .addOnFailureListener(e -> {
+                android.util.Log.e(FIRESTORE_ERROR, "Error al buscar reservas existentes", e);
+                liveData.postValue(plazas); // En caso de error, devolver todas las plazas
+            });
+    }
+
+    // Comprobar si existe un vehículo con una matrícula determinada
+    public void checkLicensePlateExists(String userId, String licensePlate, String currentVehicleId, Callback callback) {
+        firestore.collection(users).document(userId)
+            .collection(vehicles)
+            .whereEqualTo("licensePlate", licensePlate)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                boolean exists = false;
+                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                    // Si estamos editando, permitir la misma matrícula solo si es el mismo vehículo
+                    if (currentVehicleId != null && doc.getId().equals(currentVehicleId)) continue;
+                    exists = true;
+                    break;
+                }
+
+                if (exists) {
+                    callback.onFailure(); // La matrícula ya existe
+                } else {
+                    callback.onSuccess(); // La matrícula no existe o pertenece al vehículo actual
+                }
+            })
+            .addOnFailureListener(e -> {
+                android.util.Log.e(FIRESTORE_ERROR, "Error al comprobar matrícula", e);
+                callback.onFailure();
+            });
+    }
+
+    // Obtener el usuario actual autenticado
+    public FirebaseUser getCurrentUser() {
+        return firebaseAuth.getCurrentUser();
+    }
+
+    // Comprobar si hay un usuario autenticado
+    public boolean isUserAuthenticated() {
+        return firebaseAuth.getCurrentUser() != null;
+    }
+
+    // Obtener el ID del usuario actual
+    public String getCurrentUserId() {
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        return user != null ? user.getUid() : null;
+    }
+
+    // Cerrar sesión de usuario
+    public void signOut() {
+        firebaseAuth.signOut();
+    }
+
+    // Obtener nombre de usuario desde Firestore
+    public void getUsernameFromFirestore(String userId, MutableLiveData<String> usernameLiveData) {
+        firestore.collection(users)
+            .document(userId)
+            .get()
+            .addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    String username = documentSnapshot.getString("username");
+                    usernameLiveData.postValue(username);
+                }
+            })
+            .addOnFailureListener(e -> {
+                android.util.Log.e(FIRESTORE_ERROR, "Error al obtener nombre de usuario", e);
+                usernameLiveData.postValue(null);
+            });
+    }
+
+    // Añadir o actualizar vehículo
+    public void addOrUpdateVehicle(Vehicle vehicle, boolean isEdit, Callback callback) {
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        if (user == null) {
+            if (callback != null) {
+                callback.onFailure();
+            }
+            return;
+        }
+        String userId = user.getUid();
+        firestore.collection(users).document(userId).collection(vehicles)
+            .whereEqualTo("licensePlate", vehicle.getLicensePlate())
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                boolean exists = false;
+                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                    // Si estamos editando, permitir la misma matrícula solo si es el mismo vehículo
+                    if (isEdit && doc.getId().equals(vehicle.getId())) continue;
+                    exists = true;
+                    break;
+                }
+                if (exists) {
+                    if (callback != null) {
+                        callback.onFailure();
+                    }
+                } else {
+                    firestore.collection(users).document(userId).collection(vehicles)
+                        .document(vehicle.getId())
+                        .set(vehicle)
+                        .addOnSuccessListener(aVoid -> {
+                            if (callback != null) callback.onSuccess();
+                        })
+                        .addOnFailureListener(e -> {
+                            if (callback != null) {
+                                callback.onFailure();
+                            }
+                        });
+                }
+            })
+            .addOnFailureListener(e -> {
+                if (callback != null) {
+                    callback.onFailure();
+                }
             });
     }
 }

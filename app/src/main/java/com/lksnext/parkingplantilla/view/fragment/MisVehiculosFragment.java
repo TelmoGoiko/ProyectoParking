@@ -12,13 +12,11 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import com.google.firebase.auth.FirebaseAuth;
 import com.lksnext.parkingplantilla.R;
 import com.lksnext.parkingplantilla.adapter.VehicleAdapter;
 import com.lksnext.parkingplantilla.databinding.FragmentMisVehiculosBinding;
 import com.lksnext.parkingplantilla.model.Vehicle;
 import com.lksnext.parkingplantilla.viewmodel.MainViewModel;
-import com.lksnext.parkingplantilla.view.fragment.DeleteVehicleDialogFragment;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,28 +41,39 @@ public class MisVehiculosFragment extends Fragment implements VehicleAdapter.OnV
             activity.getSupportActionBar().setTitle("Mis Vehículos");
             activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        requireActivity().findViewById(R.id.mainToolbar).setOnClickListener(v -> requireActivity().onBackPressed());
+        requireActivity().findViewById(R.id.mainToolbar).setOnClickListener(v ->
+            requireActivity().getOnBackPressedDispatcher().onBackPressed());
+
         binding.recyclerViewVehiculos.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new VehicleAdapter(this);
         binding.recyclerViewVehiculos.setAdapter(adapter);
+
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        viewModel.loadVehicles(userId);
+
+        // Cargar vehículos del usuario actual
+        cargarVehiculos();
+
         viewModel.getVehiclesLiveData().observe(getViewLifecycleOwner(), vehicles -> {
             vehicleList.clear();
             if (vehicles != null) vehicleList.addAll(vehicles);
             adapter.setVehicles(new ArrayList<>(vehicleList));
             binding.tvEmptyVehiculos.setVisibility(vehicleList.isEmpty() ? View.VISIBLE : View.GONE);
         });
+
         binding.btnAddVehiculo.setOnClickListener(v -> {
             Navigation.findNavController(view).navigate(
                 com.lksnext.parkingplantilla.R.id.action_misVehiculosFragment_to_anadirEditarVehiculoFragment);
         });
     }
 
-    private void recargarVehiculos() {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        viewModel.loadVehicles(userId);
+    private void cargarVehiculos() {
+        // Obtener userId del ViewModel (el ViewModel obtiene el ID del repository)
+        String userId = viewModel.getCurrentUserId();
+        if (userId != null) {
+            viewModel.loadVehicles(userId);
+        } else {
+            Toast.makeText(getContext(), "No hay usuario autenticado", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -74,7 +83,7 @@ public class MisVehiculosFragment extends Fragment implements VehicleAdapter.OnV
         Navigation.findNavController(requireView()).navigate(
             com.lksnext.parkingplantilla.R.id.action_misVehiculosFragment_to_anadirEditarVehiculoFragment, args);
         // Recargar al volver de editar
-        requireActivity().getSupportFragmentManager().addOnBackStackChangedListener(() -> recargarVehiculos());
+        requireActivity().getSupportFragmentManager().addOnBackStackChangedListener(() -> cargarVehiculos());
     }
 
     @Override
@@ -84,7 +93,7 @@ public class MisVehiculosFragment extends Fragment implements VehicleAdapter.OnV
         Navigation.findNavController(requireView()).navigate(
             com.lksnext.parkingplantilla.R.id.action_misVehiculosFragment_to_anadirEditarVehiculoFragment, args);
         // Recargar al volver de editar
-        requireActivity().getSupportFragmentManager().addOnBackStackChangedListener(() -> recargarVehiculos());
+        requireActivity().getSupportFragmentManager().addOnBackStackChangedListener(() -> cargarVehiculos());
     }
 
     public void onDeleteClick(Vehicle vehicle) {
@@ -94,19 +103,23 @@ public class MisVehiculosFragment extends Fragment implements VehicleAdapter.OnV
     }
 
     private void eliminarVehiculo(Vehicle vehicle) {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        viewModel.deleteVehicle(userId, vehicle.getId(), new com.lksnext.parkingplantilla.domain.Callback() {
-            @Override
-            public void onSuccess() {
-                Toast.makeText(getContext(), "Vehículo eliminado", Toast.LENGTH_SHORT).show();
-                recargarVehiculos();
-            }
-            @Override
-            public void onFailure() {
-                Toast.makeText(getContext(), "Error al eliminar", Toast.LENGTH_SHORT).show();
-                recargarVehiculos();
-            }
-        });
+        String userId = viewModel.getCurrentUserId();
+        if (userId != null) {
+            viewModel.deleteVehicle(userId, vehicle.getId(), new com.lksnext.parkingplantilla.domain.Callback() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(getContext(), "Vehículo eliminado", Toast.LENGTH_SHORT).show();
+                    cargarVehiculos();
+                }
+
+                @Override
+                public void onFailure() {
+                    Toast.makeText(getContext(), "Error al eliminar el vehículo", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(getContext(), "No hay usuario autenticado", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

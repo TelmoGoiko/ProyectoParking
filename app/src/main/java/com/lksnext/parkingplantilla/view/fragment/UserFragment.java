@@ -11,8 +11,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.lksnext.parkingplantilla.databinding.FragmentUserBinding;
 import com.lksnext.parkingplantilla.view.activity.LoginActivity;
 import com.lksnext.parkingplantilla.viewmodel.ProfileViewModel;
@@ -37,7 +35,9 @@ public class UserFragment extends Fragment {
             activity.getSupportActionBar().setTitle("Perfil de Usuario");
             activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        requireActivity().findViewById(com.lksnext.parkingplantilla.R.id.mainToolbar).setOnClickListener(v -> requireActivity().onBackPressed());
+        requireActivity().findViewById(com.lksnext.parkingplantilla.R.id.mainToolbar).setOnClickListener(v ->
+            requireActivity().getOnBackPressedDispatcher().onBackPressed());
+
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         profileViewModel.loadUserData();
 
@@ -46,16 +46,10 @@ public class UserFragment extends Fragment {
             if (email != null) binding.textViewUserEmail.setText(email);
         });
 
-        // Mostrar nombre de usuario desde Firestore
-        FirebaseFirestore.getInstance().collection("users")
-            .document(profileViewModel.getCurrentUserUid())
-            .get()
-            .addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.exists()) {
-                    String username = documentSnapshot.getString("username");
-                    if (username != null) binding.textViewUserName.setText(username);
-                }
-            });
+        // Mostrar nombre de usuario
+        profileViewModel.getUserName().observe(getViewLifecycleOwner(), username -> {
+            if (username != null) binding.textViewUserName.setText(username);
+        });
 
         // Botón cambiar contraseña
         binding.btnChangePassword.setOnClickListener(v -> {
@@ -69,7 +63,7 @@ public class UserFragment extends Fragment {
 
         // Botón de logout
         binding.btnLogout.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
+            profileViewModel.signOut();
             Intent intent = new Intent(requireActivity(), LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

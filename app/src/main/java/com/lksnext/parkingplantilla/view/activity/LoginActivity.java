@@ -16,18 +16,17 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.lksnext.parkingplantilla.data.DataRepository;
 import com.lksnext.parkingplantilla.databinding.ActivityLoginBinding;
+import com.lksnext.parkingplantilla.domain.Callback;
 import com.lksnext.parkingplantilla.viewmodel.LoginViewModel;
 
 public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
     private LoginViewModel loginViewModel;
+    private DataRepository repository;
 
     private static final int RC_SIGN_IN = 9001;
     private GoogleSignInClient mGoogleSignInClient;
@@ -41,6 +40,7 @@ public class LoginActivity extends AppCompatActivity {
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        repository = DataRepository.getInstance();
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
         loginViewModel.isLogged().observe(this, isLogged -> {
@@ -87,14 +87,18 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(this, "Introduce un email válido", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                FirebaseAuth.getInstance().sendPasswordResetEmail(email)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(this, "Correo de recuperación enviado", Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(this, "Error: " + (task.getException() != null ? task.getException().getMessage() : ""), Toast.LENGTH_LONG).show();
-                        }
-                    });
+
+                repository.sendPasswordResetEmail(email, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(LoginActivity.this, "Correo de recuperación enviado", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Toast.makeText(LoginActivity.this, "Error al enviar el correo de recuperación", Toast.LENGTH_LONG).show();
+                    }
+                });
             });
             builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.cancel());
             builder.show();
@@ -120,41 +124,26 @@ public class LoginActivity extends AppCompatActivity {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-                firebaseAuthWithGoogle(account);
+                handleGoogleSignIn(account);
             } catch (ApiException e) {
                 Toast.makeText(this, "Error en Google Sign-In: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
     }
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
-            .addOnCompleteListener(this, task -> {
-                if (task.isSuccessful()) {
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    if (user != null) {
-                        // Guardar en Firestore si es nuevo
-                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        db.collection("users").document(user.getUid()).get().addOnSuccessListener(doc -> {
-                            if (!doc.exists()) {
-                                // Nuevo usuario, guardar datos
-                                String username = user.getDisplayName() != null ? user.getDisplayName() : user.getEmail().split("@")[0];
-                                db.collection("users").document(user.getUid())
-                                    .set(new java.util.HashMap<String, Object>() {{
-                                        put("username", username);
-                                        put("email", user.getEmail());
-                                        put("uid", user.getUid());
-                                    }});
-                            }
-                        });
-                    }
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    Toast.makeText(LoginActivity.this, "Error autenticando con Google", Toast.LENGTH_LONG).show();
-                }
-            });
+    private void handleGoogleSignIn(GoogleSignInAccount account) {
+        repository.firebaseAuthWithGoogle(account, new Callback() {
+            @Override
+            public void onSuccess() {
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onFailure() {
+                Toast.makeText(LoginActivity.this, "Error autenticando con Google", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

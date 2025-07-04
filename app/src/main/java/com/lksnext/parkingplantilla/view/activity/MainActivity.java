@@ -2,8 +2,6 @@ package com.lksnext.parkingplantilla.view.activity;
 
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -16,7 +14,7 @@ import com.lksnext.parkingplantilla.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ActivityMainBinding binding;
+    public ActivityMainBinding binding;
     private NavController navController;
 
     @Override
@@ -33,34 +31,14 @@ public class MainActivity extends AppCompatActivity {
         // Obtener la referencia correcta al BottomNavigationView a través del binding
         BottomNavigationView bottomNavigationView = binding.bottomNavInclude.bottomNavigationView;
 
-        if (navHostFragment != null && bottomNavigationView != null) {
+        if (navHostFragment != null) {
             navController = navHostFragment.getNavController();
 
             // Reemplazando la configuración automática con un listener personalizado
             bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    int itemId = item.getItemId();
-
-                    // Manejar la navegación igual que en MainMenuFragment
-                    if (itemId == R.id.mainMenuFragment) {
-                        navController.navigate(R.id.mainMenuFragment);
-                        return true;
-                    } else if (itemId == R.id.userFragment) {
-                        navController.navigate(R.id.userFragment);
-                        return true;
-                    } else if (itemId == R.id.reservarFragment) {
-                        // Navegar a elegirReservaFragment en lugar de reservarFragment directamente
-                        navController.navigate(R.id.elegirReservaFragment);
-                        return true;
-                    } else if (itemId == R.id.misReservasFragment) {
-                        navController.navigate(R.id.misReservasFragment);
-                        return true;
-                    } else if (itemId == R.id.misVehiculosFragment) {
-                        navController.navigate(R.id.misVehiculosFragment);
-                        return true;
-                    }
-                    return false;
+                    return navigateToMenuItem(item.getItemId());
                 }
             });
 
@@ -69,6 +47,23 @@ public class MainActivity extends AppCompatActivity {
                 // No hacer nada para evitar recrear el fragmento al pulsar el mismo botón
             });
         }
+    }
+
+    /**
+     * Permite navegar a un destino según el itemId, igual que la barra de navegación.
+     */
+    public boolean navigateToMenuItem(int itemId) {
+        if (navController == null) return false;
+        // Comprobar si ya estamos en el destino
+        int currentDest = navController.getCurrentDestination() != null ? navController.getCurrentDestination().getId() : -1;
+        int navTargetId = itemId;
+        if (itemId == R.id.reservarFragment) {
+            navTargetId = R.id.elegirReservaFragment;
+        }
+        if (currentDest == navTargetId) return true;
+        // Navegar solo si no estamos ya en el destino
+        navController.navigate(navTargetId);
+        return true;
     }
 
     @Override

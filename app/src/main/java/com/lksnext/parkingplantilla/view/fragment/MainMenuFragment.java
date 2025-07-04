@@ -7,10 +7,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 
 import com.lksnext.parkingplantilla.R;
 import com.lksnext.parkingplantilla.databinding.FragmentMainMenuBinding;
+import com.lksnext.parkingplantilla.view.activity.MainActivity;
 
 public class MainMenuFragment extends Fragment {
     private FragmentMainMenuBinding binding;
@@ -25,15 +25,30 @@ public class MainMenuFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // Configurar navegación para los botones grandes
-        binding.btnUsuario.setOnClickListener(v -> navigate(R.id.userFragment));
-        binding.btnReservar.setOnClickListener(v -> navigate(R.id.elegirReservaFragment));
-        binding.btnMisReservas.setOnClickListener(v -> navigate(R.id.misReservasFragment));
-        binding.btnMisVehiculos.setOnClickListener(v -> navigate(R.id.misVehiculosFragment));
-    }
-
-    private void navigate(int destinationId) {
-        Navigation.findNavController(requireView()).navigate(destinationId);
+        binding.btnUsuario.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).navigateToMenuItem(R.id.userFragment);
+                ((MainActivity) getActivity()).binding.bottomNavInclude.bottomNavigationView.setSelectedItemId(R.id.userFragment);
+            }
+        });
+        binding.btnReservar.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).navigateToMenuItem(R.id.reservarFragment);
+                ((MainActivity) getActivity()).binding.bottomNavInclude.bottomNavigationView.setSelectedItemId(R.id.reservarFragment);
+            }
+        });
+        binding.btnMisReservas.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).navigateToMenuItem(R.id.misReservasFragment);
+                ((MainActivity) getActivity()).binding.bottomNavInclude.bottomNavigationView.setSelectedItemId(R.id.misReservasFragment);
+            }
+        });
+        binding.btnMisVehiculos.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).navigateToMenuItem(R.id.misVehiculosFragment);
+                ((MainActivity) getActivity()).binding.bottomNavInclude.bottomNavigationView.setSelectedItemId(R.id.misVehiculosFragment);
+            }
+        });
     }
 
     @Override
