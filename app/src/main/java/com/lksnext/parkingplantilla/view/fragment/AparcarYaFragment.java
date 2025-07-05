@@ -62,6 +62,36 @@ public class AparcarYaFragment extends Fragment {
         binding.timePickerSalida.setHour(calendar.get(Calendar.HOUR_OF_DAY));
         binding.timePickerSalida.setMinute(calendar.get(Calendar.MINUTE));
 
+        // Limitar el rango de fechas y horas de salida (máximo 8 horas desde ahora y máximo 7 días desde hoy)
+        Calendar ahora = Calendar.getInstance();
+        long hoyMillis = ahora.getTimeInMillis();
+        long maxMillis = hoyMillis + 7L * 24 * 60 * 60 * 1000;
+        binding.datePickerSalida.setMinDate(hoyMillis);
+        binding.datePickerSalida.setMaxDate(maxMillis);
+        binding.timePickerSalida.setIs24HourView(true);
+
+        binding.timePickerSalida.setOnTimeChangedListener((view1, hourOfDay, minute) -> {
+            Calendar salida = Calendar.getInstance();
+            salida.set(binding.datePickerSalida.getYear(), binding.datePickerSalida.getMonth(), binding.datePickerSalida.getDayOfMonth(), hourOfDay, minute);
+            Calendar entrada = Calendar.getInstance(); // ahora
+            // Si la salida es antes de la entrada, igualar
+            if (salida.before(entrada)) {
+                binding.datePickerSalida.updateDate(entrada.get(Calendar.YEAR), entrada.get(Calendar.MONTH), entrada.get(Calendar.DAY_OF_MONTH));
+                binding.timePickerSalida.setHour(entrada.get(Calendar.HOUR_OF_DAY));
+                binding.timePickerSalida.setMinute(entrada.get(Calendar.MINUTE));
+            }
+            // Si la diferencia es mayor a 8 horas, ajustar salida
+            long diffMillis = salida.getTimeInMillis() - entrada.getTimeInMillis();
+            if (diffMillis > 8 * 60 * 60 * 1000) {
+                Calendar nuevaSalida = (Calendar) entrada.clone();
+                nuevaSalida.add(Calendar.HOUR_OF_DAY, 8);
+                binding.datePickerSalida.updateDate(nuevaSalida.get(Calendar.YEAR), nuevaSalida.get(Calendar.MONTH), nuevaSalida.get(Calendar.DAY_OF_MONTH));
+                binding.timePickerSalida.setHour(nuevaSalida.get(Calendar.HOUR_OF_DAY));
+                binding.timePickerSalida.setMinute(nuevaSalida.get(Calendar.MINUTE));
+                Toast.makeText(getContext(), "La estancia no puede superar las 8 horas", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         binding.btnContinuarAparcarYa.setOnClickListener(v -> {
             if (selectedVehicle == null) {
                 Toast.makeText(getContext(), "No se ha recibido vehículo seleccionado", Toast.LENGTH_SHORT).show();
@@ -81,9 +111,32 @@ public class AparcarYaFragment extends Fragment {
                     binding.timePickerSalida.getMinute()
             );
 
+            // Validar que la fecha de salida esté entre ahora y 7 días
+            Calendar hoy = Calendar.getInstance();
+            hoy.set(Calendar.HOUR_OF_DAY, 0);
+            hoy.set(Calendar.MINUTE, 0);
+            hoy.set(Calendar.SECOND, 0);
+            hoy.set(Calendar.MILLISECOND, 0);
+            Calendar maxFecha = (Calendar) hoy.clone();
+            maxFecha.add(Calendar.DAY_OF_YEAR, 7);
+            Calendar fechaSeleccionada = Calendar.getInstance();
+            fechaSeleccionada.set(binding.datePickerSalida.getYear(), binding.datePickerSalida.getMonth(), binding.datePickerSalida.getDayOfMonth(), 0, 0, 0);
+            fechaSeleccionada.set(Calendar.MILLISECOND, 0);
+            if (fechaSeleccionada.before(hoy) || fechaSeleccionada.after(maxFecha)) {
+                Toast.makeText(getContext(), "Solo puedes aparcar hasta 7 días naturales desde hoy.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             // Verificar que la fecha/hora de salida sea posterior a la actual
             if (fechaHoraSalida.before(fechaHoraEntrada) || fechaHoraSalida.equals(fechaHoraEntrada)) {
                 Toast.makeText(getContext(), "La fecha y hora de salida debe ser posterior a la actual", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Validar que la diferencia entre entrada y salida no supere 8 horas
+            long diffMillisHoras = fechaHoraSalida.getTimeInMillis() - fechaHoraEntrada.getTimeInMillis();
+            if (diffMillisHoras > 8 * 60 * 60 * 1000) {
+                Toast.makeText(getContext(), "La estancia no puede superar las 8 horas.", Toast.LENGTH_SHORT).show();
                 return;
             }
 

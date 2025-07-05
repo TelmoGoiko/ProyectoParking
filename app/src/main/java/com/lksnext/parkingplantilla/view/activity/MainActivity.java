@@ -1,6 +1,11 @@
 package com.lksnext.parkingplantilla.view.activity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +16,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.lksnext.parkingplantilla.R;
 import com.lksnext.parkingplantilla.databinding.ActivityMainBinding;
+
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,6 +53,28 @@ public class MainActivity extends AppCompatActivity {
             bottomNavigationView.setOnItemReselectedListener(item -> {
                 // No hacer nada para evitar recrear el fragmento al pulsar el mismo botón
             });
+        }
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(updateLocale(newBase));
+    }
+
+    private static Context updateLocale(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String langCode = prefs.getString("app_language", Locale.getDefault().getLanguage());
+        Locale locale = new Locale(langCode);
+        Locale.setDefault(locale);
+        Resources res = context.getResources();
+        Configuration config = res.getConfiguration();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale);
+            return context.createConfigurationContext(config);
+        } else {
+            config.locale = locale;
+            res.updateConfiguration(config, res.getDisplayMetrics());
+            return context;
         }
     }
 

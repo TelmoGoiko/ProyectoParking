@@ -33,24 +33,99 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp" />
 
-        <Button
-            android:id="@+id/btnReservar"
-            android:layout_width="250dp"
-            android:layout_height="80dp"
-            android:text="Reservar (fecha y hora entrada/salida)"
-            android:textSize="18sp"
+        <!-- Opciones de reserva -->
+        <LinearLayout
+            android:id="@+id/llOpciones"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
             android:layout_marginBottom="32dp"
-            android:backgroundTint="#1976D2"
-            android:textColor="@android:color/white" />
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
 
-        <Button
-            android:id="@+id/btnAparcarYa"
-            android:layout_width="250dp"
-            android:layout_height="80dp"
-            android:text="Aparcar Ya (entrada ahora, salida a elegir)"
-            android:textSize="18sp"
-            android:backgroundTint="#1976D2"
-            android:textColor="@android:color/white" />
+            <!-- Opción RESERVAR -->
+            <LinearLayout
+                android:id="@+id/opcionReservar"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/bg_reservar_card"
+                android:padding="12dp"
+                android:layout_marginEnd="8dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:id="@+id/tvReservarTitulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="RESERVAR"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="#1976D2"
+                    android:layout_marginBottom="6dp" />
+
+                <ImageView
+                    android:id="@+id/ivReservarIcono"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@android:drawable/ic_menu_my_calendar"
+                    android:layout_marginBottom="6dp"
+                    app:tint="#1976D2" />
+
+                <TextView
+                    android:id="@+id/tvReservarExplicacion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Elige fecha y hora de entrada/salida"
+                    android:textSize="11sp"
+                    android:textColor="#888888" />
+            </LinearLayout>
+
+            <!-- Opción APARCAR YA -->
+            <LinearLayout
+                android:id="@+id/opcionAparcarYa"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/bg_aparcar_card"
+                android:padding="12dp"
+                android:layout_marginStart="8dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:id="@+id/tvAparcarTitulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="APARCAR YA"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="#388E3C"
+                    android:layout_marginBottom="6dp" />
+
+                <ImageView
+                    android:id="@+id/ivAparcarIcono"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_parking"
+                    android:layout_marginBottom="6dp"
+                    app:tint="#388E3C" />
+
+                <TextView
+                    android:id="@+id/tvAparcarExplicacion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Entrada ahora, salida a elegir"
+                    android:textSize="11sp"
+                    android:textColor="#888888" />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
     <!-- Puedes añadir aquí mensajes de ayuda, instrucciones o imágenes si lo ves conveniente para mejorar la UX -->
 </androidx.constraintlayout.widget.ConstraintLayout>

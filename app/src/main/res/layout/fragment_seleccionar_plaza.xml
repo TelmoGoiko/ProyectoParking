@@ -41,6 +41,127 @@
             <!-- Aquí se cargarán dinámicamente las plazas disponibles -->
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/seccionCoche"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Plazas coche"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:padding="8dp" />
+            <LinearLayout
+                android:id="@+id/containerCoche"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/seccionCocheElectrico"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Plazas coche eléctrico"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:padding="8dp" />
+            <LinearLayout
+                android:id="@+id/containerCocheElectrico"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/seccionCocheMinusvalido"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Plazas coche minusválido"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:padding="8dp" />
+            <LinearLayout
+                android:id="@+id/containerCocheMinusvalido"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/seccionCocheMinusvalidoElectrico"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Plazas coche minusválido eléctrico"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:padding="8dp" />
+            <LinearLayout
+                android:id="@+id/containerCocheMinusvalidoElectrico"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/seccionMoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Plazas moto"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:padding="8dp" />
+            <LinearLayout
+                android:id="@+id/containerMoto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/seccionMotoMinusvalida"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Plazas moto minusválida"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:padding="8dp" />
+            <LinearLayout
+                android:id="@+id/containerMotoMinusvalida"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </LinearLayout>
+
         <Button
             android:id="@+id/btnConfirmarReserva"
             android:layout_width="match_parent"

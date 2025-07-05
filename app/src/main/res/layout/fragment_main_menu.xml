@@ -64,16 +64,20 @@
         app:layout_constraintTop_toBottomOf="@id/logoContainer"
         app:layout_constraintBottom_toTopOf="@id/guidelineHorizontal50"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/guidelineVertical50">
+        app:layout_constraintEnd_toStartOf="@id/guidelineVertical50"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="16dp">
+            android:padding="10dp">
             <ImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:src="@drawable/ic_person_foreground"
                 app:tint="@android:color/white" />
             <TextView
@@ -81,7 +85,7 @@
                 android:layout_height="wrap_content"
                 android:text="Mi Perfil"
                 android:textColor="@android:color/white"
-                android:textSize="22sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -97,24 +101,28 @@
         app:layout_constraintTop_toBottomOf="@id/logoContainer"
         app:layout_constraintBottom_toTopOf="@id/guidelineHorizontal50"
         app:layout_constraintStart_toStartOf="@id/guidelineVertical50"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="16dp">
+            android:padding="10dp">
             <ImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@drawable/ic_reservations_foreground"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_parking"
                 app:tint="@android:color/white" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Reservar"
                 android:textColor="@android:color/white"
-                android:textSize="22sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -130,16 +138,20 @@
         app:layout_constraintTop_toTopOf="@id/guidelineHorizontal50"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/guidelineVertical50">
+        app:layout_constraintEnd_toStartOf="@id/guidelineVertical50"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="16dp">
+            android:padding="10dp">
             <ImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:src="@drawable/ic_reservations_foreground"
                 app:tint="@android:color/white" />
             <TextView
@@ -147,7 +159,7 @@
                 android:layout_height="wrap_content"
                 android:text="Mis Reservas"
                 android:textColor="@android:color/white"
-                android:textSize="22sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -163,16 +175,20 @@
         app:layout_constraintTop_toTopOf="@id/guidelineHorizontal50"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/guidelineVertical50"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="16dp">
+            android:padding="10dp">
             <ImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:src="@drawable/ic_vehicles_foreground"
                 app:tint="@android:color/white" />
             <TextView
@@ -180,7 +196,7 @@
                 android:layout_height="wrap_content"
                 android:text="Mis Vehículos"
                 android:textColor="@android:color/white"
-                android:textSize="22sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>

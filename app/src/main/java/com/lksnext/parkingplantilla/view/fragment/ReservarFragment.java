@@ -1,5 +1,6 @@
 package com.lksnext.parkingplantilla.view.fragment;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -118,6 +119,63 @@ public class ReservarFragment extends Fragment {
         binding.timePickerSalida.setHour(calendar.get(Calendar.HOUR_OF_DAY));
         binding.timePickerSalida.setMinute(calendar.get(Calendar.MINUTE));
 
+        // Limitar el rango de fechas de los DatePickers (solo hoy hasta 7 días después)
+        long hoyMillis = System.currentTimeMillis();
+        long maxMillis = hoyMillis + 7L * 24 * 60 * 60 * 1000;
+        binding.datePickerEntrada.setMinDate(hoyMillis);
+        binding.datePickerEntrada.setMaxDate(maxMillis);
+        binding.datePickerSalida.setMinDate(hoyMillis);
+        binding.datePickerSalida.setMaxDate(maxMillis);
+
+        // Listeners para limitar la diferencia máxima de 8 horas
+        binding.timePickerEntrada.setIs24HourView(true);
+        binding.timePickerSalida.setIs24HourView(true);
+
+        binding.timePickerEntrada.setOnTimeChangedListener((view1, hourOfDay, minute) -> {
+            Calendar entrada = Calendar.getInstance();
+            entrada.set(binding.datePickerEntrada.getYear(), binding.datePickerEntrada.getMonth(), binding.datePickerEntrada.getDayOfMonth(), hourOfDay, minute);
+            Calendar salida = Calendar.getInstance();
+            salida.set(binding.datePickerSalida.getYear(), binding.datePickerSalida.getMonth(), binding.datePickerSalida.getDayOfMonth(), binding.timePickerSalida.getHour(), binding.timePickerSalida.getMinute());
+            // Si la salida es antes de la entrada, igualar
+            if (salida.before(entrada)) {
+                binding.datePickerSalida.updateDate(binding.datePickerEntrada.getYear(), binding.datePickerEntrada.getMonth(), binding.datePickerEntrada.getDayOfMonth());
+                binding.timePickerSalida.setHour(hourOfDay);
+                binding.timePickerSalida.setMinute(minute);
+            }
+            // Si la diferencia es mayor a 8 horas, ajustar salida
+            long diffMillis = salida.getTimeInMillis() - entrada.getTimeInMillis();
+            if (diffMillis > 8 * 60 * 60 * 1000) {
+                Calendar nuevaSalida = (Calendar) entrada.clone();
+                nuevaSalida.add(Calendar.HOUR_OF_DAY, 8);
+                binding.datePickerSalida.updateDate(nuevaSalida.get(Calendar.YEAR), nuevaSalida.get(Calendar.MONTH), nuevaSalida.get(Calendar.DAY_OF_MONTH));
+                binding.timePickerSalida.setHour(nuevaSalida.get(Calendar.HOUR_OF_DAY));
+                binding.timePickerSalida.setMinute(nuevaSalida.get(Calendar.MINUTE));
+                Toast.makeText(getContext(), "La reserva no puede superar las 8 horas", Toast.LENGTH_SHORT).show();
+            }
+        });
+        binding.timePickerSalida.setOnTimeChangedListener((view12, hourOfDay, minute) -> {
+            Calendar entrada = Calendar.getInstance();
+            entrada.set(binding.datePickerEntrada.getYear(), binding.datePickerEntrada.getMonth(), binding.datePickerEntrada.getDayOfMonth(), binding.timePickerEntrada.getHour(), binding.timePickerEntrada.getMinute());
+            Calendar salida = Calendar.getInstance();
+            salida.set(binding.datePickerSalida.getYear(), binding.datePickerSalida.getMonth(), binding.datePickerSalida.getDayOfMonth(), hourOfDay, minute);
+            // Si la salida es antes de la entrada, igualar
+            if (salida.before(entrada)) {
+                binding.datePickerSalida.updateDate(binding.datePickerEntrada.getYear(), binding.datePickerEntrada.getMonth(), binding.datePickerEntrada.getDayOfMonth());
+                binding.timePickerSalida.setHour(binding.timePickerEntrada.getHour());
+                binding.timePickerSalida.setMinute(binding.timePickerEntrada.getMinute());
+            }
+            // Si la diferencia es mayor a 8 horas, ajustar salida
+            long diffMillis = salida.getTimeInMillis() - entrada.getTimeInMillis();
+            if (diffMillis > 8 * 60 * 60 * 1000) {
+                Calendar nuevaSalida = (Calendar) entrada.clone();
+                nuevaSalida.add(Calendar.HOUR_OF_DAY, 8);
+                binding.datePickerSalida.updateDate(nuevaSalida.get(Calendar.YEAR), nuevaSalida.get(Calendar.MONTH), nuevaSalida.get(Calendar.DAY_OF_MONTH));
+                binding.timePickerSalida.setHour(nuevaSalida.get(Calendar.HOUR_OF_DAY));
+                binding.timePickerSalida.setMinute(nuevaSalida.get(Calendar.MINUTE));
+                Toast.makeText(getContext(), "La reserva no puede superar las 8 horas", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         binding.btnContinuarReserva.setOnClickListener(v -> {
             if (selectedVehicle == null && !isEditMode) {
                 Toast.makeText(getContext(), "No se ha recibido vehículo seleccionado", Toast.LENGTH_SHORT).show();
@@ -153,6 +211,29 @@ public class ReservarFragment extends Fragment {
             Calendar ahora = Calendar.getInstance();
             if (fechaHoraEntrada.before(ahora)) {
                 Toast.makeText(getContext(), "La fecha y hora de entrada debe ser posterior a la actual", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Validar que la fecha seleccionada esté entre hoy y 7 días
+            Calendar hoy = Calendar.getInstance();
+            hoy.set(Calendar.HOUR_OF_DAY, 0);
+            hoy.set(Calendar.MINUTE, 0);
+            hoy.set(Calendar.SECOND, 0);
+            hoy.set(Calendar.MILLISECOND, 0);
+            Calendar maxFecha = (Calendar) hoy.clone();
+            maxFecha.add(Calendar.DAY_OF_YEAR, 7);
+            Calendar fechaSeleccionada = Calendar.getInstance();
+            fechaSeleccionada.set(binding.datePickerEntrada.getYear(), binding.datePickerEntrada.getMonth(), binding.datePickerEntrada.getDayOfMonth(), 0, 0, 0);
+            fechaSeleccionada.set(Calendar.MILLISECOND, 0);
+            if (fechaSeleccionada.before(hoy) || fechaSeleccionada.after(maxFecha)) {
+                Toast.makeText(getContext(), "Solo puedes reservar desde hoy hasta 7 días naturales.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Validar que la diferencia entre entrada y salida no supere 8 horas
+            long diffMillisHoras = fechaHoraSalida.getTimeInMillis() - fechaHoraEntrada.getTimeInMillis();
+            if (diffMillisHoras > 8 * 60 * 60 * 1000) {
+                Toast.makeText(getContext(), "La reserva no puede superar las 8 horas.", Toast.LENGTH_SHORT).show();
                 return;
             }
 

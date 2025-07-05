@@ -34,4 +34,7 @@
     <string name="reservar">Reservar</string>
     <string name="user_avatar">avatar</string>
     <string name="default_web_client_id">875322472892-c206g9hrqao0kkjhc100ph2ggi082hgd.apps.googleusercontent.com</string>
+    <string name="cambiar_contrasena">Cambiar contraseña</string>
+    <string name="idioma">Idioma</string>
+    <string name="cerrar_sesion">Cerrar sesión</string>
 </resources>

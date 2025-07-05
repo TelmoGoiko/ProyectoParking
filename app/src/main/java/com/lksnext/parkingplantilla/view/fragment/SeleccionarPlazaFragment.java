@@ -42,6 +42,9 @@ public class SeleccionarPlazaFragment extends Fragment {
     private Plaza selectedPlaza;
     private boolean aparcarYa;
 
+    private LinearLayout seccionCoche, seccionCocheElectrico, seccionCocheMinusvalido, seccionCocheMinusvalidoElectrico, seccionMoto, seccionMotoMinusvalida;
+    private LinearLayout containerCoche, containerCocheElectrico, containerCocheMinusvalido, containerCocheMinusvalidoElectrico, containerMoto, containerMotoMinusvalida;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -49,6 +52,18 @@ public class SeleccionarPlazaFragment extends Fragment {
         plazasContainer = view.findViewById(R.id.plazasContainer);
         tvFechaHora = view.findViewById(R.id.tvFechaHora);
         btnConfirmarReserva = view.findViewById(R.id.btnConfirmarReserva);
+        seccionCoche = view.findViewById(R.id.seccionCoche);
+        seccionCocheElectrico = view.findViewById(R.id.seccionCocheElectrico);
+        seccionCocheMinusvalido = view.findViewById(R.id.seccionCocheMinusvalido);
+        seccionCocheMinusvalidoElectrico = view.findViewById(R.id.seccionCocheMinusvalidoElectrico);
+        seccionMoto = view.findViewById(R.id.seccionMoto);
+        seccionMotoMinusvalida = view.findViewById(R.id.seccionMotoMinusvalida);
+        containerCoche = view.findViewById(R.id.containerCoche);
+        containerCocheElectrico = view.findViewById(R.id.containerCocheElectrico);
+        containerCocheMinusvalido = view.findViewById(R.id.containerCocheMinusvalido);
+        containerCocheMinusvalidoElectrico = view.findViewById(R.id.containerCocheMinusvalidoElectrico);
+        containerMoto = view.findViewById(R.id.containerMoto);
+        containerMotoMinusvalida = view.findViewById(R.id.containerMotoMinusvalida);
         return view;
     }
 
@@ -97,7 +112,20 @@ public class SeleccionarPlazaFragment extends Fragment {
     }
 
     private void mostrarPlazasDisponibles(List<Plaza> plazas) {
-        plazasContainer.removeAllViews();
+        // Limpiar contenedores y ocultar secciones
+        containerCoche.removeAllViews();
+        containerCocheElectrico.removeAllViews();
+        containerCocheMinusvalido.removeAllViews();
+        containerCocheMinusvalidoElectrico.removeAllViews();
+        containerMoto.removeAllViews();
+        containerMotoMinusvalida.removeAllViews();
+        seccionCoche.setVisibility(View.GONE);
+        seccionCocheElectrico.setVisibility(View.GONE);
+        seccionCocheMinusvalido.setVisibility(View.GONE);
+        seccionCocheMinusvalidoElectrico.setVisibility(View.GONE);
+        seccionMoto.setVisibility(View.GONE);
+        seccionMotoMinusvalida.setVisibility(View.GONE);
+        plazasContainer.removeAllViews(); // Para mensajes de error
 
         if (plazas == null || plazas.isEmpty()) {
             TextView tvNoPlazas = new TextView(requireContext());
@@ -118,75 +146,7 @@ public class SeleccionarPlazaFragment extends Fragment {
             return;
         }
 
-        // Agrupar plazas por tipo
-        LinearLayout plazasNormales = new LinearLayout(requireContext());
-        plazasNormales.setOrientation(LinearLayout.VERTICAL);
-        TextView tvNormales = new TextView(requireContext());
-        tvNormales.setText("Plazas normales");
-        tvNormales.setTextSize(18);
-        tvNormales.setPadding(16, 32, 16, 16);
-        plazasNormales.addView(tvNormales);
-
-        LinearLayout plazasDiscapacitados = new LinearLayout(requireContext());
-        plazasDiscapacitados.setOrientation(LinearLayout.VERTICAL);
-        TextView tvDiscapacitados = new TextView(requireContext());
-        tvDiscapacitados.setText("Plazas para discapacitados");
-        tvDiscapacitados.setTextSize(18);
-        tvDiscapacitados.setPadding(16, 32, 16, 16);
-        plazasDiscapacitados.addView(tvDiscapacitados);
-
-        LinearLayout plazasElectricos = new LinearLayout(requireContext());
-        plazasElectricos.setOrientation(LinearLayout.VERTICAL);
-        TextView tvElectricos = new TextView(requireContext());
-        tvElectricos.setText("Plazas para vehículos eléctricos");
-        tvElectricos.setTextSize(18);
-        tvElectricos.setPadding(16, 32, 16, 16);
-        plazasElectricos.addView(tvElectricos);
-
-        LinearLayout plazasMotos = new LinearLayout(requireContext());
-        plazasMotos.setOrientation(LinearLayout.VERTICAL);
-        TextView tvMotos = new TextView(requireContext());
-        tvMotos.setText("Plazas para motos");
-        tvMotos.setTextSize(18);
-        tvMotos.setPadding(16, 32, 16, 16);
-        plazasMotos.addView(tvMotos);
-
-        // Crear grid de botones para cada tipo de plaza
-        LinearLayout gridNormales = new LinearLayout(requireContext());
-        gridNormales.setOrientation(LinearLayout.HORIZONTAL);
-        gridNormales.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
-        plazasNormales.addView(gridNormales);
-
-        LinearLayout gridDiscapacitados = new LinearLayout(requireContext());
-        gridDiscapacitados.setOrientation(LinearLayout.HORIZONTAL);
-        gridDiscapacitados.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
-        plazasDiscapacitados.addView(gridDiscapacitados);
-
-        LinearLayout gridElectricos = new LinearLayout(requireContext());
-        gridElectricos.setOrientation(LinearLayout.HORIZONTAL);
-        gridElectricos.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
-        plazasElectricos.addView(gridElectricos);
-
-        LinearLayout gridMotos = new LinearLayout(requireContext());
-        gridMotos.setOrientation(LinearLayout.HORIZONTAL);
-        gridMotos.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
-        plazasMotos.addView(gridMotos);
-
-        // Contador para crear filas en el grid
-        int contadorNormales = 0;
-        int contadorDiscapacitados = 0;
-        int contadorElectricos = 0;
-        int contadorMotos = 0;
-
-        // Crear botones para cada plaza
+        // Agrupar y mostrar plazas por tipo
         for (Plaza plaza : plazasFiltradas) {
             Button btnPlaza = new Button(requireContext());
             btnPlaza.setText(String.valueOf(plaza.getId()));
@@ -194,101 +154,64 @@ public class SeleccionarPlazaFragment extends Fragment {
                     0,
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     1.0f));
-
-            // Estilo según tipo de plaza
-            if ("normal".equals(plaza.getTipo())) {
-                btnPlaza.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light, requireContext().getTheme()));
-                if (contadorNormales % 4 == 0) {
-                    gridNormales = new LinearLayout(requireContext());
-                    gridNormales.setOrientation(LinearLayout.HORIZONTAL);
-                    gridNormales.setLayoutParams(new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT));
-                    plazasNormales.addView(gridNormales);
-                }
-                gridNormales.addView(btnPlaza);
-                contadorNormales++;
-            } else if ("discapacitados".equals(plaza.getTipo())) {
-                btnPlaza.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light, requireContext().getTheme()));
-                if (contadorDiscapacitados % 4 == 0) {
-                    gridDiscapacitados = new LinearLayout(requireContext());
-                    gridDiscapacitados.setOrientation(LinearLayout.HORIZONTAL);
-                    gridDiscapacitados.setLayoutParams(new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT));
-                    plazasDiscapacitados.addView(gridDiscapacitados);
-                }
-                gridDiscapacitados.addView(btnPlaza);
-                contadorDiscapacitados++;
-            } else if ("eléctricos".equals(plaza.getTipo())) {
-                btnPlaza.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light, requireContext().getTheme()));
-                if (contadorElectricos % 4 == 0) {
-                    gridElectricos = new LinearLayout(requireContext());
-                    gridElectricos.setOrientation(LinearLayout.HORIZONTAL);
-                    gridElectricos.setLayoutParams(new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT));
-                    plazasElectricos.addView(gridElectricos);
-                }
-                gridElectricos.addView(btnPlaza);
-                contadorElectricos++;
-            } else if ("moto".equals(plaza.getTipo())) {
-                btnPlaza.setBackgroundColor(getResources().getColor(android.R.color.holo_purple, requireContext().getTheme()));
-                if (contadorMotos % 4 == 0) {
-                    gridMotos = new LinearLayout(requireContext());
-                    gridMotos.setOrientation(LinearLayout.HORIZONTAL);
-                    gridMotos.setLayoutParams(new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT));
-                    plazasMotos.addView(gridMotos);
-                }
-                gridMotos.addView(btnPlaza);
-                contadorMotos++;
+            // Asignar color y contenedor según tipo
+            LinearLayout targetContainer = null;
+            LinearLayout targetSection = null;
+            switch (plaza.getTipo()) {
+                case "normal":
+                    btnPlaza.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light, requireContext().getTheme()));
+                    targetContainer = containerCoche;
+                    targetSection = seccionCoche;
+                    break;
+                case "electrico":
+                    btnPlaza.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light, requireContext().getTheme()));
+                    targetContainer = containerCocheElectrico;
+                    targetSection = seccionCocheElectrico;
+                    break;
+                case "minusvalido":
+                    btnPlaza.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light, requireContext().getTheme()));
+                    targetContainer = containerCocheMinusvalido;
+                    targetSection = seccionCocheMinusvalido;
+                    break;
+                case "electrico_minusvalido":
+                    btnPlaza.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light, requireContext().getTheme()));
+                    targetContainer = containerCocheMinusvalidoElectrico;
+                    targetSection = seccionCocheMinusvalidoElectrico;
+                    break;
+                case "moto":
+                    btnPlaza.setBackgroundColor(getResources().getColor(android.R.color.holo_purple, requireContext().getTheme()));
+                    targetContainer = containerMoto;
+                    targetSection = seccionMoto;
+                    break;
+                case "moto_minusvalido":
+                    btnPlaza.setBackgroundColor(getResources().getColor(android.R.color.darker_gray, requireContext().getTheme()));
+                    targetContainer = containerMotoMinusvalida;
+                    targetSection = seccionMotoMinusvalida;
+                    break;
             }
-
+            if (targetContainer != null && targetSection != null) {
+                targetContainer.addView(btnPlaza);
+                targetSection.setVisibility(View.VISIBLE);
+            }
             final Plaza plazaSeleccionada = plaza;
             btnPlaza.setOnClickListener(v -> {
-                // Deseleccionar todas las plazas
-                for (int i = 0; i < plazasContainer.getChildCount(); i++) {
-                    View child = plazasContainer.getChildAt(i);
-                    if (child instanceof LinearLayout) {
-                        LinearLayout layout = (LinearLayout) child;
-                        for (int j = 1; j < layout.getChildCount(); j++) { // Empezar desde 1 para saltar el TextView
-                            View subChild = layout.getChildAt(j);
-                            if (subChild instanceof LinearLayout) {
-                                LinearLayout subLayout = (LinearLayout) subChild;
-                                for (int k = 0; k < subLayout.getChildCount(); k++) {
-                                    View button = subLayout.getChildAt(k);
-                                    if (button instanceof Button) {
-                                        button.setAlpha(1.0f);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Resaltar la plaza seleccionada
+                // Deseleccionar todos los botones
+                deseleccionarTodasLasPlazas();
                 btnPlaza.setAlpha(0.5f);
                 selectedPlaza = plazaSeleccionada;
                 btnConfirmarReserva.setEnabled(true);
-
                 Toast.makeText(requireContext(), "Plaza " + plaza.getId() + " seleccionada", Toast.LENGTH_SHORT).show();
             });
         }
+    }
 
-        // Añadir las secciones al contenedor principal
-        if (contadorNormales > 0) {
-            plazasContainer.addView(plazasNormales);
-        }
-        if (contadorDiscapacitados > 0) {
-            plazasContainer.addView(plazasDiscapacitados);
-        }
-        if (contadorElectricos > 0) {
-            plazasContainer.addView(plazasElectricos);
-        }
-        if (contadorMotos > 0) {
-            plazasContainer.addView(plazasMotos);
+    private void deseleccionarTodasLasPlazas() {
+        LinearLayout[] containers = {containerCoche, containerCocheElectrico, containerCocheMinusvalido, containerCocheMinusvalidoElectrico, containerMoto, containerMotoMinusvalida};
+        for (LinearLayout container : containers) {
+            for (int i = 0; i < container.getChildCount(); i++) {
+                View v = container.getChildAt(i);
+                if (v instanceof Button) v.setAlpha(1.0f);
+            }
         }
     }
 
@@ -297,30 +220,54 @@ public class SeleccionarPlazaFragment extends Fragment {
      */
     private List<Plaza> filtrarPlazasSegunVehiculo(List<Plaza> plazasDisponibles, Vehicle vehiculo) {
         List<Plaza> plazasFiltradas = new ArrayList<>();
+        Vehicle.VehicleType tipoVehiculo = vehiculo.getType();
+        boolean esElectrico = vehiculo.isElectric();
+        boolean esMinusvalido = vehiculo.isForDisabled();
 
         for (Plaza plaza : plazasDisponibles) {
-            // Filtro para vehículos eléctricos
-            if ("eléctricos".equals(plaza.getTipo()) && !vehiculo.isElectric()) {
-                continue; // Saltar esta plaza si no es un vehículo eléctrico
-            }
-
-            // Filtro para plazas de discapacitados
-            if ("discapacitados".equals(plaza.getTipo()) && !vehiculo.isForDisabled()) {
-                continue; // Saltar esta plaza si no es un vehículo para discapacitados
-            }
-
-            // Filtro para plazas de moto
-            if ("moto".equals(plaza.getTipo()) && vehiculo.getType() != Vehicle.VehicleType.MOTORCYCLE) {
-                continue; // Saltar esta plaza si no es una moto
-            }
-
-            // Los coches no pueden aparcar en plazas de moto
-            if (vehiculo.getType() == Vehicle.VehicleType.MOTORCYCLE ||
-                    !"moto".equals(plaza.getTipo())) {
-                plazasFiltradas.add(plaza);
+            String tipoPlaza = plaza.getTipo();
+            switch (tipoVehiculo) {
+                case CAR:
+                    if (esElectrico && esMinusvalido) {
+                        // Coche minusválido eléctrico
+                        if (tipoPlaza.equals("electrico_minusvalido") || tipoPlaza.equals("electrico") || tipoPlaza.equals("minusvalido") || tipoPlaza.equals("normal")) {
+                            plazasFiltradas.add(plaza);
+                        }
+                    } else if (esElectrico) {
+                        // Coche eléctrico
+                        if (tipoPlaza.equals("electrico") || tipoPlaza.equals("normal")) {
+                            plazasFiltradas.add(plaza);
+                        }
+                    } else if (esMinusvalido) {
+                        // Coche minusválido
+                        if (tipoPlaza.equals("minusvalido") || tipoPlaza.equals("normal")) {
+                            plazasFiltradas.add(plaza);
+                        }
+                    } else {
+                        // Coche normal
+                        if (tipoPlaza.equals("normal")) {
+                            plazasFiltradas.add(plaza);
+                        }
+                    }
+                    break;
+                case MOTORCYCLE:
+                    if (esMinusvalido) {
+                        // Moto minusválida
+                        if (tipoPlaza.equals("moto_minusvalida") || tipoPlaza.equals("moto")) {
+                            plazasFiltradas.add(plaza);
+                        }
+                    } else {
+                        // Moto normal
+                        if (tipoPlaza.equals("moto")) {
+                            plazasFiltradas.add(plaza);
+                        }
+                    }
+                    break;
+                default:
+                    // Otros tipos de vehículo, no permitidos
+                    break;
             }
         }
-
         return plazasFiltradas;
     }
 

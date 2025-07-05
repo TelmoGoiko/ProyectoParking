@@ -208,18 +208,88 @@ public class DataRepository {
             });
     }
 
-    // Crear una nueva reserva
+    // Crear una nueva reserva con validaciones de solapamiento, duración y rango de fechas
     public void createReserva(String userId, com.lksnext.parkingplantilla.domain.Reserva reserva, Callback callback) {
-        if (reserva.getId() == null || reserva.getId().isEmpty()) {
-            reserva.setId(firestore.collection(reservas).document().getId());
+        // Validación: duración máxima 8 horas
+        if (reserva.getHoraInicio() != null) {
+            long duracionSegundos = reserva.getHoraInicio().getHoraFin() - reserva.getHoraInicio().getHoraInicio();
+            if (duracionSegundos > 8 * 3600) {
+                callback.onFailure();
+                return;
+            }
         }
 
-        firestore.collection(users).document(userId)
-            .collection(reservas).document(reserva.getId())
-            .set(reserva)
-            .addOnSuccessListener(aVoid -> callback.onSuccess())
+        // Validación: fecha entre hoy y 7 días naturales
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+        java.util.Calendar hoy = java.util.Calendar.getInstance();
+        java.util.Calendar fechaReserva = java.util.Calendar.getInstance();
+        try {
+            fechaReserva.setTime(sdf.parse(reserva.getFecha()));
+        } catch (Exception e) {
+            callback.onFailure();
+            return;
+        }
+        java.util.Calendar maxFecha = (java.util.Calendar) hoy.clone();
+        maxFecha.add(java.util.Calendar.DAY_OF_YEAR, 7);
+        // Limpiar horas para comparar solo fechas
+        hoy.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        hoy.set(java.util.Calendar.MINUTE, 0);
+        hoy.set(java.util.Calendar.SECOND, 0);
+        hoy.set(java.util.Calendar.MILLISECOND, 0);
+        fechaReserva.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        fechaReserva.set(java.util.Calendar.MINUTE, 0);
+        fechaReserva.set(java.util.Calendar.SECOND, 0);
+        fechaReserva.set(java.util.Calendar.MILLISECOND, 0);
+        maxFecha.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        maxFecha.set(java.util.Calendar.MINUTE, 0);
+        maxFecha.set(java.util.Calendar.SECOND, 0);
+        maxFecha.set(java.util.Calendar.MILLISECOND, 0);
+        if (fechaReserva.before(hoy) || fechaReserva.after(maxFecha)) {
+            callback.onFailure();
+            return;
+        }
+
+        // Validación: no solapamiento de reservas para la misma plaza
+        firestore.collectionGroup(reservas)
+            .whereEqualTo("fecha", reserva.getFecha())
+            .whereEqualTo("plazaId.id", reserva.getPlazaId().getId())
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                boolean solapada = false;
+                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                    com.lksnext.parkingplantilla.domain.Reserva r = doc.toObject(com.lksnext.parkingplantilla.domain.Reserva.class);
+                    if (r.getId().equals(reserva.getId())) continue; // Permitir editar la misma reserva
+                    if (r.getHoraInicio() != null && reserva.getHoraInicio() != null) {
+                        long start1 = r.getHoraInicio().getHoraInicio();
+                        long end1 = r.getHoraInicio().getHoraFin();
+                        long start2 = reserva.getHoraInicio().getHoraInicio();
+                        long end2 = reserva.getHoraInicio().getHoraFin();
+                        // Si se solapan
+                        if (start1 < end2 && start2 < end1) {
+                            solapada = true;
+                            break;
+                        }
+                    }
+                }
+                if (solapada) {
+                    callback.onFailure();
+                } else {
+                    // Si pasa todas las validaciones, guardar la reserva
+                    if (reserva.getId() == null || reserva.getId().isEmpty()) {
+                        reserva.setId(firestore.collection(reservas).document().getId());
+                    }
+                    firestore.collection(users).document(userId)
+                        .collection(reservas).document(reserva.getId())
+                        .set(reserva)
+                        .addOnSuccessListener(aVoid -> callback.onSuccess())
+                        .addOnFailureListener(e -> {
+                            android.util.Log.e(FIRESTORE_ERROR, "Error al guardar reserva", e);
+                            callback.onFailure();
+                        });
+                }
+            })
             .addOnFailureListener(e -> {
-                android.util.Log.e(FIRESTORE_ERROR, "Error al guardar reserva", e);
+                android.util.Log.e(FIRESTORE_ERROR, "Error al comprobar solapamiento de reservas", e);
                 callback.onFailure();
             });
     }
@@ -260,12 +330,78 @@ public class DataRepository {
 
     // Actualizar una reserva existente
     public void updateReserva(String userId, com.lksnext.parkingplantilla.domain.Reserva reserva, Callback callback) {
-        firestore.collection(users).document(userId)
-            .collection(reservas).document(reserva.getId())
-            .set(reserva)
-            .addOnSuccessListener(aVoid -> callback.onSuccess())
+        // Validación: duración máxima 8 horas
+        if (reserva.getHoraInicio() != null) {
+            long duracionSegundos = reserva.getHoraInicio().getHoraFin() - reserva.getHoraInicio().getHoraInicio();
+            if (duracionSegundos > 8 * 3600) {
+                callback.onFailure();
+                return;
+            }
+        }
+        // Validación: fecha entre hoy y 7 días naturales
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+        java.util.Calendar hoy = java.util.Calendar.getInstance();
+        java.util.Calendar fechaReserva = java.util.Calendar.getInstance();
+        try {
+            fechaReserva.setTime(sdf.parse(reserva.getFecha()));
+        } catch (Exception e) {
+            callback.onFailure();
+            return;
+        }
+        java.util.Calendar maxFecha = (java.util.Calendar) hoy.clone();
+        maxFecha.add(java.util.Calendar.DAY_OF_YEAR, 7);
+        hoy.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        hoy.set(java.util.Calendar.MINUTE, 0);
+        hoy.set(java.util.Calendar.SECOND, 0);
+        hoy.set(java.util.Calendar.MILLISECOND, 0);
+        fechaReserva.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        fechaReserva.set(java.util.Calendar.MINUTE, 0);
+        fechaReserva.set(java.util.Calendar.SECOND, 0);
+        fechaReserva.set(java.util.Calendar.MILLISECOND, 0);
+        maxFecha.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        maxFecha.set(java.util.Calendar.MINUTE, 0);
+        maxFecha.set(java.util.Calendar.SECOND, 0);
+        maxFecha.set(java.util.Calendar.MILLISECOND, 0);
+        if (fechaReserva.before(hoy) || fechaReserva.after(maxFecha)) {
+            callback.onFailure();
+            return;
+        }
+        // Validación: no solapamiento de reservas para la misma plaza
+        firestore.collectionGroup(reservas)
+            .whereEqualTo("fecha", reserva.getFecha())
+            .whereEqualTo("plazaId.id", reserva.getPlazaId().getId())
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                boolean solapada = false;
+                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                    com.lksnext.parkingplantilla.domain.Reserva r = doc.toObject(com.lksnext.parkingplantilla.domain.Reserva.class);
+                    if (r.getId().equals(reserva.getId())) continue; // Permitir editar la misma reserva
+                    if (r.getHoraInicio() != null && reserva.getHoraInicio() != null) {
+                        long start1 = r.getHoraInicio().getHoraInicio();
+                        long end1 = r.getHoraInicio().getHoraFin();
+                        long start2 = reserva.getHoraInicio().getHoraInicio();
+                        long end2 = reserva.getHoraInicio().getHoraFin();
+                        if (start1 < end2 && start2 < end1) {
+                            solapada = true;
+                            break;
+                        }
+                    }
+                }
+                if (solapada) {
+                    callback.onFailure();
+                } else {
+                    firestore.collection(users).document(userId)
+                        .collection(reservas).document(reserva.getId())
+                        .set(reserva)
+                        .addOnSuccessListener(aVoid -> callback.onSuccess())
+                        .addOnFailureListener(e -> {
+                            android.util.Log.e(FIRESTORE_ERROR, "Error al actualizar reserva", e);
+                            callback.onFailure();
+                        });
+                }
+            })
             .addOnFailureListener(e -> {
-                android.util.Log.e(FIRESTORE_ERROR, "Error al actualizar reserva", e);
+                android.util.Log.e(FIRESTORE_ERROR, "Error al comprobar solapamiento de reservas", e);
                 callback.onFailure();
             });
     }
@@ -286,14 +422,29 @@ public class DataRepository {
     public void getAvailablePlazas(String fecha, com.lksnext.parkingplantilla.domain.Hora hora, MutableLiveData<List<com.lksnext.parkingplantilla.domain.Plaza>> liveData) {
         // Simular plazas disponibles (esto debería consultarse en Firebase)
         List<com.lksnext.parkingplantilla.domain.Plaza> plazas = new ArrayList<>();
+        // Plazas para coches normales
         for (int i = 1; i <= 10; i++) {
             plazas.add(new com.lksnext.parkingplantilla.domain.Plaza(i, "normal"));
         }
-        for (int i = 11; i <= 15; i++) {
-            plazas.add(new com.lksnext.parkingplantilla.domain.Plaza(i, "discapacitados"));
+        // Plazas para coches minusválidos
+        for (int i = 11; i <= 13; i++) {
+            plazas.add(new com.lksnext.parkingplantilla.domain.Plaza(i, "minusvalido"));
         }
-        for (int i = 16; i <= 20; i++) {
-            plazas.add(new com.lksnext.parkingplantilla.domain.Plaza(i, "eléctricos"));
+        // Plazas para coches eléctricos
+        for (int i = 14; i <= 16; i++) {
+            plazas.add(new com.lksnext.parkingplantilla.domain.Plaza(i, "electrico"));
+        }
+        // Plazas para coches eléctricos minusválidos
+        for (int i = 17; i <= 18; i++) {
+            plazas.add(new com.lksnext.parkingplantilla.domain.Plaza(i, "electrico_minusvalido"));
+        }
+        // Plazas para motos normales
+        for (int i = 19; i <= 22; i++) {
+            plazas.add(new com.lksnext.parkingplantilla.domain.Plaza(i, "moto"));
+        }
+        // Plazas para motos minusválidos
+        for (int i = 23; i <= 24; i++) {
+            plazas.add(new com.lksnext.parkingplantilla.domain.Plaza(i, "moto_minusvalido"));
         }
 
         // Buscar reservas existentes para esa fecha y hora

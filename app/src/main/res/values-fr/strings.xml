@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">ParkingPlantilla</string>
+    <string name="selectDate">Sélectionnez une date</string>
+    <string name="fragment_main">Principal</string>
+    <string name="fragment_step1">Étape 1</string>
+    <string name="fragment_step2">Étape 2</string>
+    <string name="fragment_end">Fin</string>
+    <string name="buscar">Rechercher des places libres</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Bonjour fragment vide</string>
+    <string name="google">Google</string>
+    <string name="facebook">Facebook</string>
+    <string name="no_tienes_cuenta_reg_strate">Vous n´avez pas de compte ? Inscrivez-vous</string>
+    <!-- Strings for MisReservasActivity and EditarReservaActivity -->
+    <string name="mis_reservas">Mes réservations</string>
+    <string name="volver">Retour</string>
+    <string name="no_tienes_reservas">Vous n´avez aucune réservation active</string>
+    <string name="editar_reserva">Modifier la réservation</string>
+    <string name="parking">Parking :</string>
+    <string name="fecha">Date :</string>
+    <string name="hora_inicio">Heure de début :</string>
+    <string name="hora_fin">Heure de fin :</string>
+    <string name="estado">Statut :</string>
+    <string name="guardar_cambios">Enregistrer les modifications</string>
+    <string name="eliminar">Supprimer</string>
+    <string name="editar">Modifier</string>
+    <string name="eliminar_reserva_titulo">Supprimer la réservation</string>
+    <string name="eliminar_reserva_mensaje">Êtes-vous sûr de vouloir supprimer cette réservation ?</string>
+    <string name="si">Oui</string>
+    <string name="no">Non</string>
+    <string name="reservar">Réserver</string>
+    <string name="user_avatar">avatar</string>
+    <string name="default_web_client_id">875322472892-c206g9hrqao0kkjhc100ph2ggi082hgd.apps.googleusercontent.com</string>
+    <string name="cambiar_contrasena">Cambiar contraseña</string>
+    <string name="idioma">Idioma</string>
+    <string name="cerrar_sesion">Cerrar sesión</string>
+</resources>
+

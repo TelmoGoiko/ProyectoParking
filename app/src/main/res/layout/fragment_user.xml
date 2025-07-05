@@ -61,7 +61,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Cambiar contraseña" />
+                android:text="@string/cambiar_contrasena" />
+
+            <TextView
+                android:id="@+id/textViewLanguageLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/idioma"
+                android:textStyle="bold"
+                android:textSize="16sp" />
+
+            <Spinner
+                android:id="@+id/spinnerLanguage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
 
             <View
                 android:layout_width="match_parent"
@@ -74,7 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Cerrar sesión"
+                android:text="@string/cerrar_sesion"
                 android:backgroundTint="#1976D2"
                 android:textColor="@android:color/white" />
         </LinearLayout>

@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">ParkingPlantilla</string>
+    <string name="selectDate">Aukeratu data bat</string>
+    <string name="fragment_main">Nagusia</string>
+    <string name="fragment_step1">1. urratsa</string>
+    <string name="fragment_step2">2. urratsa</string>
+    <string name="fragment_end">Amaiera</string>
+    <string name="buscar">Plaza libreak bilatu</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Kaixo, fragmentu hutsa</string>
+    <string name="google">Google</string>
+    <string name="facebook">Facebook</string>
+    <string name="no_tienes_cuenta_reg_strate">Ez duzu konturik? Erregistratu</string>
+    <!-- Strings for MisReservasActivity and EditarReservaActivity -->
+    <string name="mis_reservas">Nire erreserbak</string>
+    <string name="volver">Itzuli</string>
+    <string name="no_tienes_reservas">Ez duzu erreserba aktiborik</string>
+    <string name="editar_reserva">Erreserba editatu</string>
+    <string name="parking">Parking-a:</string>
+    <string name="fecha">Data:</string>
+    <string name="hora_inicio">Hasiera ordua:</string>
+    <string name="hora_fin">Amaiera ordua:</string>
+    <string name="estado">Egoera:</string>
+    <string name="guardar_cambios">Aldaketak gorde</string>
+    <string name="eliminar">Ezabatu</string>
+    <string name="editar">Editatu</string>
+    <string name="eliminar_reserva_titulo">Erreserba ezabatu</string>
+    <string name="eliminar_reserva_mensaje">Ziur zaude erreserba hau ezabatu nahi duzula?</string>
+    <string name="si">Bai</string>
+    <string name="no">Ez</string>
+    <string name="reservar">Erreserbatu</string>
+    <string name="user_avatar">avatar</string>
+    <string name="default_web_client_id">875322472892-c206g9hrqao0kkjhc100ph2ggi082hgd.apps.googleusercontent.com</string>
+    <string name="cambiar_contrasena">Cambiar contraseña</string>
+    <string name="idioma">Idioma</string>
+    <string name="cerrar_sesion">Cerrar sesión</string>
+</resources>
+

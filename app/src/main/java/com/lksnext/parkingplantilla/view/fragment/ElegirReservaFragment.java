@@ -70,7 +70,8 @@ public class ElegirReservaFragment extends Fragment {
                 selectedVehicle = null;
             }
         });
-        binding.btnReservar.setOnClickListener(v -> {
+        // Adaptación: ahora los "cuadrados" son opcionReservar y opcionAparcarYa
+        binding.opcionReservar.setOnClickListener(v -> {
             if (selectedVehicle == null) {
                 Toast.makeText(getContext(), "Selecciona un vehículo", Toast.LENGTH_SHORT).show();
                 return;
@@ -80,7 +81,7 @@ public class ElegirReservaFragment extends Fragment {
             Navigation.findNavController(view).navigate(
                 com.lksnext.parkingplantilla.R.id.action_elegirReservaFragment_to_reservarFragment, args);
         });
-        binding.btnAparcarYa.setOnClickListener(v -> {
+        binding.opcionAparcarYa.setOnClickListener(v -> {
             if (selectedVehicle == null) {
                 Toast.makeText(getContext(), "Selecciona un vehículo", Toast.LENGTH_SHORT).show();
                 return;
