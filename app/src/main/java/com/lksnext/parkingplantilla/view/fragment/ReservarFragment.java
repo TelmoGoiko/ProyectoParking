@@ -258,21 +258,37 @@ public class ReservarFragment extends Fragment {
                     }
                 });
             } else {
-                // Pasar datos al siguiente fragmento (ElegirReservaFragment)
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("selectedVehicle", selectedVehicle);
-                bundle.putString("fecha", fechaFormatted);
-                bundle.putLong("horaInicio", horaInicioTimestamp);
-                bundle.putLong("horaFin", horaFinTimestamp);
-
-                // Cargar plazas disponibles
-                reservasViewModel.loadAvailablePlazas(fechaFormatted, hora);
-
-                // Navegar al fragmento de selección de plaza
-                Navigation.findNavController(requireView()).navigate(
-                        com.lksnext.parkingplantilla.R.id.action_reservarFragment_to_seleccionarPlazaFragment,
-                        bundle
-                );
+                // Comprobar reservas solapadas antes de navegar
+                reservasViewModel.loadUserReservas();
+                reservasViewModel.getUserReservas().observe(getViewLifecycleOwner(), reservas -> {
+                    boolean solapada = false;
+                    if (reservas != null) {
+                        for (com.lksnext.parkingplantilla.domain.Reserva r : reservas) {
+                            if (r.getFecha() != null && r.getFecha().equals(fechaFormatted) && r.getHoraInicio() != null) {
+                                long start1 = r.getHoraInicio().getHoraInicio();
+                                long end1 = r.getHoraInicio().getHoraFin();
+                                if (horaInicioTimestamp < end1 && start1 < horaFinTimestamp) {
+                                    solapada = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (solapada) {
+                        Toast.makeText(getContext(), "Ya tienes una reserva en ese rango de horas.", Toast.LENGTH_LONG).show();
+                    } else {
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("selectedVehicle", selectedVehicle);
+                        bundle.putString("fecha", fechaFormatted);
+                        bundle.putLong("horaInicio", horaInicioTimestamp);
+                        bundle.putLong("horaFin", horaFinTimestamp);
+                        reservasViewModel.loadAvailablePlazas(fechaFormatted, hora);
+                        Navigation.findNavController(requireView()).navigate(
+                                com.lksnext.parkingplantilla.R.id.action_reservarFragment_to_seleccionarPlazaFragment,
+                                bundle
+                        );
+                    }
+                });
             }
         });
     }

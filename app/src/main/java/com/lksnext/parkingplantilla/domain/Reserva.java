@@ -2,7 +2,7 @@ package com.lksnext.parkingplantilla.domain;
 
 public class Reserva {
 
-    String fecha, usuario, id;
+    String fecha, vehicleId, id, estado;
 
     Plaza plaza;
 
@@ -12,9 +12,9 @@ public class Reserva {
 
     }
 
-    public Reserva(String fecha, String usuario, String id, Plaza plaza, Hora hora) {
+    public Reserva(String fecha, String vehicleId, String id, Plaza plaza, Hora hora) {
         this.fecha = fecha;
-        this.usuario = usuario;
+        this.vehicleId = vehicleId;
         this.plaza = plaza;
         this.hora = hora;
         this.id = id;
@@ -28,12 +28,12 @@ public class Reserva {
         this.fecha = fecha;
     }
 
-    public String getUsuario() {
-        return usuario;
+    public String getVehicleId() {
+        return vehicleId;
     }
 
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
+    public void setVehicleId(String vehicleId) {
+        this.vehicleId = vehicleId;
     }
 
     public Plaza getPlazaId() {
@@ -66,5 +66,13 @@ public class Reserva {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }

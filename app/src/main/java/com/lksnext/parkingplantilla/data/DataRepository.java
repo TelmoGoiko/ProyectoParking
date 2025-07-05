@@ -146,7 +146,36 @@ public class DataRepository {
         firestore.collection(users).document(userId)
             .collection(vehicles).document(vehicleId)
             .delete()
-            .addOnSuccessListener(aVoid -> callback.onSuccess())
+            .addOnSuccessListener(aVoid -> {
+                // Eliminar reservas futuras asociadas a este vehículo
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+                String today = sdf.format(new java.util.Date());
+                firestore.collection(users).document(userId)
+                    .collection(reservas)
+                    .whereEqualTo("vehicleId", vehicleId)
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                            com.lksnext.parkingplantilla.domain.Reserva reserva = doc.toObject(com.lksnext.parkingplantilla.domain.Reserva.class);
+                            if (reserva != null && reserva.getFecha() != null) {
+                                try {
+                                    java.util.Date reservaDate = sdf.parse(reserva.getFecha());
+                                    java.util.Date todayDate = sdf.parse(today);
+                                    if (!reservaDate.before(todayDate)) { // Solo reservas de hoy o futuras
+                                        doc.getReference().delete();
+                                    }
+                                } catch (Exception e) {
+                                    // Si hay error de parseo, por seguridad no borramos
+                                }
+                            }
+                        }
+                        callback.onSuccess();
+                    })
+                    .addOnFailureListener(e -> {
+                        android.util.Log.e(FIRESTORE_ERROR, "Error al eliminar reservas asociadas al vehículo", e);
+                        callback.onFailure();
+                    });
+            })
             .addOnFailureListener(e -> {
                 android.util.Log.e(FIRESTORE_ERROR, "Error al eliminar vehículo", e);
                 callback.onFailure();
@@ -220,90 +249,145 @@ public class DataRepository {
         }
 
         // Validación: fecha entre hoy y 7 días naturales
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+        final java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
         java.util.Calendar hoy = java.util.Calendar.getInstance();
         java.util.Calendar fechaReserva = java.util.Calendar.getInstance();
         try {
             fechaReserva.setTime(sdf.parse(reserva.getFecha()));
         } catch (Exception e) {
-            callback.onFailure();
+            callback.onFailure("Error al analizar la fecha de la reserva.");
             return;
         }
         java.util.Calendar maxFecha = (java.util.Calendar) hoy.clone();
         maxFecha.add(java.util.Calendar.DAY_OF_YEAR, 7);
-        // Limpiar horas para comparar solo fechas
-        hoy.set(java.util.Calendar.HOUR_OF_DAY, 0);
-        hoy.set(java.util.Calendar.MINUTE, 0);
-        hoy.set(java.util.Calendar.SECOND, 0);
-        hoy.set(java.util.Calendar.MILLISECOND, 0);
-        fechaReserva.set(java.util.Calendar.HOUR_OF_DAY, 0);
-        fechaReserva.set(java.util.Calendar.MINUTE, 0);
-        fechaReserva.set(java.util.Calendar.SECOND, 0);
-        fechaReserva.set(java.util.Calendar.MILLISECOND, 0);
-        maxFecha.set(java.util.Calendar.HOUR_OF_DAY, 0);
-        maxFecha.set(java.util.Calendar.MINUTE, 0);
-        maxFecha.set(java.util.Calendar.SECOND, 0);
-        maxFecha.set(java.util.Calendar.MILLISECOND, 0);
+        // Normalizar horas a cero
+        for (java.util.Calendar cal : new java.util.Calendar[]{hoy, fechaReserva, maxFecha}) {
+            cal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+            cal.set(java.util.Calendar.MINUTE, 0);
+            cal.set(java.util.Calendar.SECOND, 0);
+            cal.set(java.util.Calendar.MILLISECOND, 0);
+        }
         if (fechaReserva.before(hoy) || fechaReserva.after(maxFecha)) {
-            callback.onFailure();
+            callback.onFailure("La fecha de la reserva debe estar entre hoy y 7 días naturales.");
             return;
         }
 
-        // Validación: no solapamiento de reservas para la misma plaza
-        firestore.collectionGroup(reservas)
-            .whereEqualTo("fecha", reserva.getFecha())
-            .whereEqualTo("plazaId.id", reserva.getPlazaId().getId())
+        // NUEVA VALIDACIÓN: Comprobar que el vehículo existe y pertenece al usuario
+        String vehicleId = reserva.getVehicleId();
+        firestore.collection(users).document(userId)
+            .collection(vehicles).document(vehicleId)
             .get()
-            .addOnSuccessListener(queryDocumentSnapshots -> {
-                boolean solapada = false;
-                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                    com.lksnext.parkingplantilla.domain.Reserva r = doc.toObject(com.lksnext.parkingplantilla.domain.Reserva.class);
-                    if (r.getId().equals(reserva.getId())) continue; // Permitir editar la misma reserva
-                    if (r.getHoraInicio() != null && reserva.getHoraInicio() != null) {
-                        long start1 = r.getHoraInicio().getHoraInicio();
-                        long end1 = r.getHoraInicio().getHoraFin();
-                        long start2 = reserva.getHoraInicio().getHoraInicio();
-                        long end2 = reserva.getHoraInicio().getHoraFin();
-                        // Si se solapan
-                        if (start1 < end2 && start2 < end1) {
-                            solapada = true;
-                            break;
+            .addOnSuccessListener(vehicleDoc -> {
+                if (!vehicleDoc.exists()) {
+                    callback.onFailure("El vehículo seleccionado no existe o no pertenece al usuario.");
+                    return;
+                }
+                // Validación: no solapamiento de reservas para la misma plaza
+                firestore.collectionGroup(reservas)
+                    .whereEqualTo("fecha", reserva.getFecha())
+                    .whereEqualTo("plazaId.id", reserva.getPlazaId().getId())
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        boolean solapada = false;
+                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                            com.lksnext.parkingplantilla.domain.Reserva r = doc.toObject(com.lksnext.parkingplantilla.domain.Reserva.class);
+                            if (r.getId().equals(reserva.getId())) continue; // Permitir editar la misma reserva
+                            if (r.getHoraInicio() != null && reserva.getHoraInicio() != null) {
+                                long start1 = r.getHoraInicio().getHoraInicio();
+                                long end1 = r.getHoraInicio().getHoraFin();
+                                long start2 = reserva.getHoraInicio().getHoraInicio();
+                                long end2 = reserva.getHoraInicio().getHoraFin();
+                                // Si se solapan
+                                if (start1 < end2 && start2 < end1) {
+                                    solapada = true;
+                                    break;
+                                }
+                            }
                         }
-                    }
-                }
-                if (solapada) {
-                    callback.onFailure();
-                } else {
-                    // Si pasa todas las validaciones, guardar la reserva
-                    if (reserva.getId() == null || reserva.getId().isEmpty()) {
-                        reserva.setId(firestore.collection(reservas).document().getId());
-                    }
-                    firestore.collection(users).document(userId)
-                        .collection(reservas).document(reserva.getId())
-                        .set(reserva)
-                        .addOnSuccessListener(aVoid -> callback.onSuccess())
-                        .addOnFailureListener(e -> {
-                            android.util.Log.e(FIRESTORE_ERROR, "Error al guardar reserva", e);
-                            callback.onFailure();
-                        });
-                }
+                        if (solapada) {
+                            callback.onFailure("La plaza ya está reservada en ese rango horario.");
+                        } else {
+                            // Validación: no solapamiento de reservas para el mismo vehículo en cualquier plaza en el mismo rango horario
+                            firestore.collectionGroup(reservas)
+                                .whereEqualTo("fecha", reserva.getFecha())
+                                .whereEqualTo("vehicleId", reserva.getVehicleId())
+                                .get()
+                                .addOnSuccessListener(vehicleDocs -> {
+                                    boolean solapadaVehiculo = false;
+                                    for (QueryDocumentSnapshot doc : vehicleDocs) {
+                                        com.lksnext.parkingplantilla.domain.Reserva r = doc.toObject(com.lksnext.parkingplantilla.domain.Reserva.class);
+                                        if (r.getId().equals(reserva.getId())) continue;
+                                        if (r.getHoraInicio() != null && reserva.getHoraInicio() != null) {
+                                            long start1 = r.getHoraInicio().getHoraInicio();
+                                            long end1 = r.getHoraInicio().getHoraFin();
+                                            long start2 = reserva.getHoraInicio().getHoraInicio();
+                                            long end2 = reserva.getHoraInicio().getHoraFin();
+                                            if (start1 < end2 && start2 < end1) {
+                                                solapadaVehiculo = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if (solapadaVehiculo) {
+                                        callback.onFailure("Este vehículo ya tiene una reserva en ese rango horario. No puedes reservar dos plazas a la vez con el mismo vehículo.");
+                                    } else {
+                                        // Si pasa todas las validaciones, guardar la reserva
+                                        if (reserva.getId() == null || reserva.getId().isEmpty()) {
+                                            reserva.setId(firestore.collection(reservas).document().getId());
+                                        }
+                                        firestore.collection(users).document(userId)
+                                            .collection(reservas).document(reserva.getId())
+                                            .set(reserva)
+                                            .addOnSuccessListener(aVoid -> callback.onSuccess())
+                                            .addOnFailureListener(e -> {
+                                                android.util.Log.e(FIRESTORE_ERROR, "Error al guardar reserva", e);
+                                                callback.onFailure("Error al guardar la reserva en la base de datos.");
+                                            });
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    android.util.Log.e(FIRESTORE_ERROR, "Error al comprobar solapamiento de reservas de vehículo", e);
+                                    callback.onFailure("Error al comprobar solapamiento de reservas de vehículo");
+                                });
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        android.util.Log.e(FIRESTORE_ERROR, "Error al comprobar solapamiento de reservas", e);
+                        callback.onFailure("Error al comprobar solapamiento de reservas");
+                    });
             })
             .addOnFailureListener(e -> {
-                android.util.Log.e(FIRESTORE_ERROR, "Error al comprobar solapamiento de reservas", e);
-                callback.onFailure();
+                android.util.Log.e(FIRESTORE_ERROR, "Error al comprobar existencia de vehículo", e);
+                callback.onFailure("Error al comprobar existencia de vehículo");
             });
     }
 
-    // Obtener todas las reservas de un usuario
+    // Obtener todas las reservas de un usuario y actualizar su estado si ya han finalizado
     public void getReservasByUser(String userId, MutableLiveData<List<com.lksnext.parkingplantilla.domain.Reserva>> liveData) {
         firestore.collection(users).document(userId)
             .collection(reservas)
             .get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 List<com.lksnext.parkingplantilla.domain.Reserva> reservasList = new ArrayList<>();
+                java.util.Date now = new java.util.Date();
                 for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                     com.lksnext.parkingplantilla.domain.Reserva reserva = doc.toObject(com.lksnext.parkingplantilla.domain.Reserva.class);
-                    if (reserva != null) reservasList.add(reserva);
+                    if (reserva != null) {
+                        boolean needsUpdate = false;
+                        // Si la reserva tiene hora de fin y ya ha pasado, marcar como finalizada
+                        if (reserva.getHoraInicio() != null && reserva.getEstado() != null && !"finalizada".equals(reserva.getEstado())) {
+                            long fin = reserva.getHoraInicio().getHoraFin() * 1000L; // asume segundos
+                            if (now.getTime() > fin) {
+                                reserva.setEstado("finalizada");
+                                needsUpdate = true;
+                            }
+                        }
+                        if (needsUpdate) {
+                            // Actualizar en Firestore
+                            doc.getReference().update("estado", "finalizada");
+                        }
+                        reservasList.add(reserva);
+                    }
                 }
                 liveData.postValue(reservasList);
             })
@@ -334,75 +418,115 @@ public class DataRepository {
         if (reserva.getHoraInicio() != null) {
             long duracionSegundos = reserva.getHoraInicio().getHoraFin() - reserva.getHoraInicio().getHoraInicio();
             if (duracionSegundos > 8 * 3600) {
-                callback.onFailure();
+                callback.onFailure("La reserva no puede superar las 8 horas.");
                 return;
             }
         }
         // Validación: fecha entre hoy y 7 días naturales
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+        final java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
         java.util.Calendar hoy = java.util.Calendar.getInstance();
         java.util.Calendar fechaReserva = java.util.Calendar.getInstance();
         try {
             fechaReserva.setTime(sdf.parse(reserva.getFecha()));
         } catch (Exception e) {
-            callback.onFailure();
+            callback.onFailure("Error al analizar la fecha de la reserva.");
             return;
         }
         java.util.Calendar maxFecha = (java.util.Calendar) hoy.clone();
         maxFecha.add(java.util.Calendar.DAY_OF_YEAR, 7);
-        hoy.set(java.util.Calendar.HOUR_OF_DAY, 0);
-        hoy.set(java.util.Calendar.MINUTE, 0);
-        hoy.set(java.util.Calendar.SECOND, 0);
-        hoy.set(java.util.Calendar.MILLISECOND, 0);
-        fechaReserva.set(java.util.Calendar.HOUR_OF_DAY, 0);
-        fechaReserva.set(java.util.Calendar.MINUTE, 0);
-        fechaReserva.set(java.util.Calendar.SECOND, 0);
-        fechaReserva.set(java.util.Calendar.MILLISECOND, 0);
-        maxFecha.set(java.util.Calendar.HOUR_OF_DAY, 0);
-        maxFecha.set(java.util.Calendar.MINUTE, 0);
-        maxFecha.set(java.util.Calendar.SECOND, 0);
-        maxFecha.set(java.util.Calendar.MILLISECOND, 0);
+        // Normalizar horas a cero
+        for (java.util.Calendar cal : new java.util.Calendar[]{hoy, fechaReserva, maxFecha}) {
+            cal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+            cal.set(java.util.Calendar.MINUTE, 0);
+            cal.set(java.util.Calendar.SECOND, 0);
+            cal.set(java.util.Calendar.MILLISECOND, 0);
+        }
         if (fechaReserva.before(hoy) || fechaReserva.after(maxFecha)) {
-            callback.onFailure();
+            callback.onFailure("La fecha de la reserva debe estar entre hoy y 7 días naturales.");
             return;
         }
-        // Validación: no solapamiento de reservas para la misma plaza
-        firestore.collectionGroup(reservas)
-            .whereEqualTo("fecha", reserva.getFecha())
-            .whereEqualTo("plazaId.id", reserva.getPlazaId().getId())
+        // NUEVA VALIDACIÓN: Comprobar que el vehículo existe y pertenece al usuario
+        String vehicleId = reserva.getVehicleId();
+        firestore.collection(users).document(userId)
+            .collection(vehicles).document(vehicleId)
             .get()
-            .addOnSuccessListener(queryDocumentSnapshots -> {
-                boolean solapada = false;
-                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                    com.lksnext.parkingplantilla.domain.Reserva r = doc.toObject(com.lksnext.parkingplantilla.domain.Reserva.class);
-                    if (r.getId().equals(reserva.getId())) continue; // Permitir editar la misma reserva
-                    if (r.getHoraInicio() != null && reserva.getHoraInicio() != null) {
-                        long start1 = r.getHoraInicio().getHoraInicio();
-                        long end1 = r.getHoraInicio().getHoraFin();
-                        long start2 = reserva.getHoraInicio().getHoraInicio();
-                        long end2 = reserva.getHoraInicio().getHoraFin();
-                        if (start1 < end2 && start2 < end1) {
-                            solapada = true;
-                            break;
+            .addOnSuccessListener(vehicleDoc -> {
+                if (!vehicleDoc.exists()) {
+                    callback.onFailure("El vehículo seleccionado no existe o no pertenece al usuario.");
+                    return;
+                }
+                // Validación: no solapamiento de reservas para la misma plaza
+                firestore.collectionGroup(reservas)
+                    .whereEqualTo("fecha", reserva.getFecha())
+                    .whereEqualTo("plazaId.id", reserva.getPlazaId().getId())
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        boolean solapada = false;
+                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                            com.lksnext.parkingplantilla.domain.Reserva r = doc.toObject(com.lksnext.parkingplantilla.domain.Reserva.class);
+                            if (r.getId().equals(reserva.getId())) continue; // Permitir editar la misma reserva
+                            if (r.getHoraInicio() != null && reserva.getHoraInicio() != null) {
+                                long start1 = r.getHoraInicio().getHoraInicio();
+                                long end1 = r.getHoraInicio().getHoraFin();
+                                long start2 = reserva.getHoraInicio().getHoraInicio();
+                                long end2 = reserva.getHoraInicio().getHoraFin();
+                                if (start1 < end2 && start2 < end1) {
+                                    solapada = true;
+                                    break;
+                                }
+                            }
                         }
-                    }
-                }
-                if (solapada) {
-                    callback.onFailure();
-                } else {
-                    firestore.collection(users).document(userId)
-                        .collection(reservas).document(reserva.getId())
-                        .set(reserva)
-                        .addOnSuccessListener(aVoid -> callback.onSuccess())
-                        .addOnFailureListener(e -> {
-                            android.util.Log.e(FIRESTORE_ERROR, "Error al actualizar reserva", e);
-                            callback.onFailure();
-                        });
-                }
+                        if (solapada) {
+                            callback.onFailure("La plaza ya está reservada en ese rango horario.");
+                        } else {
+                            // Validación: no solapamiento de reservas para el mismo vehículo en cualquier plaza en el mismo rango horario
+                            firestore.collectionGroup(reservas)
+                                .whereEqualTo("fecha", reserva.getFecha())
+                                .whereEqualTo("vehicleId", reserva.getVehicleId())
+                                .get()
+                                .addOnSuccessListener(vehicleDocs -> {
+                                    boolean solapadaVehiculo = false;
+                                    for (QueryDocumentSnapshot doc : vehicleDocs) {
+                                        com.lksnext.parkingplantilla.domain.Reserva r = doc.toObject(com.lksnext.parkingplantilla.domain.Reserva.class);
+                                        if (r.getId().equals(reserva.getId())) continue;
+                                        if (r.getHoraInicio() != null && reserva.getHoraInicio() != null) {
+                                            long start1 = r.getHoraInicio().getHoraInicio();
+                                            long end1 = r.getHoraInicio().getHoraFin();
+                                            long start2 = reserva.getHoraInicio().getHoraInicio();
+                                            long end2 = reserva.getHoraInicio().getHoraFin();
+                                            if (start1 < end2 && start2 < end1) {
+                                                solapadaVehiculo = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if (solapadaVehiculo) {
+                                        callback.onFailure("Este vehículo ya tiene una reserva en ese rango horario. No puedes reservar dos plazas a la vez con el mismo vehículo.");
+                                    } else {
+                                        firestore.collection(users).document(userId)
+                                            .collection(reservas).document(reserva.getId())
+                                            .set(reserva)
+                                            .addOnSuccessListener(aVoid -> callback.onSuccess())
+                                            .addOnFailureListener(e -> {
+                                                android.util.Log.e(FIRESTORE_ERROR, "Error al actualizar reserva", e);
+                                                callback.onFailure("Error al actualizar la reserva en la base de datos.");
+                                            });
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    android.util.Log.e(FIRESTORE_ERROR, "Error al comprobar solapamiento de reservas de vehículo", e);
+                                    callback.onFailure("Error al comprobar solapamiento de reservas de vehículo");
+                                });
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        android.util.Log.e(FIRESTORE_ERROR, "Error al comprobar solapamiento de reservas", e);
+                        callback.onFailure("Error al comprobar solapamiento de reservas");
+                    });
             })
             .addOnFailureListener(e -> {
-                android.util.Log.e(FIRESTORE_ERROR, "Error al comprobar solapamiento de reservas", e);
-                callback.onFailure();
+                android.util.Log.e(FIRESTORE_ERROR, "Error al comprobar existencia de vehículo", e);
+                callback.onFailure("Error al comprobar existencia de vehículo");
             });
     }
 
@@ -459,25 +583,26 @@ public class DataRepository {
                         // Comprobar si hay solapamiento de horas
                         com.lksnext.parkingplantilla.domain.Hora horaReserva = reserva.getHoraInicio();
                         if (horaReserva != null) {
-                            if ((horaReserva.getHoraInicio() <= hora.getHoraInicio() &&
-                                 horaReserva.getHoraFin() > hora.getHoraInicio()) ||
-                                (horaReserva.getHoraInicio() < hora.getHoraFin() &&
-                                 horaReserva.getHoraFin() >= hora.getHoraFin()) ||
-                                (horaReserva.getHoraInicio() >= hora.getHoraInicio() &&
-                                 horaReserva.getHoraFin() <= hora.getHoraFin())) {
+                            long start1 = horaReserva.getHoraInicio();
+                            long end1 = horaReserva.getHoraFin();
+                            long start2 = hora.getHoraInicio();
+                            long end2 = hora.getHoraFin();
+                            if (start1 < end2 && start2 < end1) {
                                 reservasExistentes.add(reserva);
                             }
                         }
                     }
                 }
 
-                // Filtrar las plazas que ya están reservadas
+                // Filtrar las plazas que ya están reservadas en ese rango horario (por cualquier vehículo)
+                List<Integer> plazasOcupadas = new ArrayList<>();
                 for (com.lksnext.parkingplantilla.domain.Reserva reserva : reservasExistentes) {
                     com.lksnext.parkingplantilla.domain.Plaza plazaReservada = reserva.getPlazaId();
-                    if (plazaReservada != null) {
-                        plazas.removeIf(plaza -> plaza.getId() == plazaReservada.getId());
+                    if (plazaReservada != null && !plazasOcupadas.contains(plazaReservada.getId())) {
+                        plazasOcupadas.add(plazaReservada.getId());
                     }
                 }
+                plazas.removeIf(plaza -> plazasOcupadas.contains(plaza.getId()));
 
                 liveData.postValue(plazas);
             })

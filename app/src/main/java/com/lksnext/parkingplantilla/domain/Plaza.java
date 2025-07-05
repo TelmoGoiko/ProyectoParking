@@ -22,8 +22,8 @@ public class Plaza {
         this.tipo = tipo;
     }
 
-    public long getId() {
-        return id;
+    public int getId() {
+        return (int) id;
     }
 
     public void setId(long id) {

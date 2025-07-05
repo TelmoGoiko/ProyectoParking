@@ -195,12 +195,16 @@ public class SeleccionarPlazaFragment extends Fragment {
             }
             final Plaza plazaSeleccionada = plaza;
             btnPlaza.setOnClickListener(v -> {
+                // Comprobación extra: ¿la plaza sigue disponible?
+                if (!plazasFiltradas.contains(plazaSeleccionada)) {
+                    Toast.makeText(requireContext(), "Esta plaza ya no está disponible", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 // Deseleccionar todos los botones
                 deseleccionarTodasLasPlazas();
                 btnPlaza.setAlpha(0.5f);
                 selectedPlaza = plazaSeleccionada;
                 btnConfirmarReserva.setEnabled(true);
-                Toast.makeText(requireContext(), "Plaza " + plaza.getId() + " seleccionada", Toast.LENGTH_SHORT).show();
             });
         }
     }
@@ -286,16 +290,18 @@ public class SeleccionarPlazaFragment extends Fragment {
         // Crear objeto Hora
         Hora hora = new Hora(horaInicio, horaFin);
 
-        // Crear reserva - ya no pasamos el userId porque el ViewModel lo obtiene del Repository
-        reservasViewModel.createReserva(fecha, selectedPlaza, hora);
+        // Crear reserva pasando el vehicleId correcto
+        reservasViewModel.createReserva(fecha, selectedPlaza, hora, selectedVehicle != null ? selectedVehicle.getId() : null);
 
         // Observar el resultado
         reservasViewModel.isReservaCreated().observe(getViewLifecycleOwner(), isCreated -> {
             if (isCreated != null && isCreated) {
-                Toast.makeText(requireContext(), "Reserva creada con éxito", Toast.LENGTH_LONG).show();
-                // Navegar a mis reservas
-                Navigation.findNavController(requireView()).navigate(
-                        R.id.action_seleccionarPlazaFragment_to_misReservasFragment);
+                // Solo mostrar éxito si no hay error
+                String error = reservasViewModel.getErrorMessage().getValue();
+                if (error == null || error.isEmpty()) {
+                    Toast.makeText(requireContext(), "Reserva creada con éxito", Toast.LENGTH_LONG).show();
+                    Navigation.findNavController(requireView()).navigate(R.id.action_seleccionarPlazaFragment_to_misReservasFragment);
+                }
             }
         });
 

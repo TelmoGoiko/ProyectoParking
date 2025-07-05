@@ -1,5 +1,8 @@
 package com.lksnext.parkingplantilla.viewmodel;
 
+import android.app.Application;
+
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -9,10 +12,11 @@ import com.lksnext.parkingplantilla.domain.Callback;
 import com.lksnext.parkingplantilla.domain.Hora;
 import com.lksnext.parkingplantilla.domain.Plaza;
 import com.lksnext.parkingplantilla.domain.Reserva;
+import com.lksnext.parkingplantilla.util.NotificacionReservaScheduler;
 
 import java.util.List;
 
-public class ReservasViewModel extends ViewModel {
+public class ReservasViewModel extends androidx.lifecycle.AndroidViewModel {
 
     private final DataRepository repository;
     private final MutableLiveData<List<Plaza>> availablePlazas = new MutableLiveData<>();
@@ -23,7 +27,8 @@ public class ReservasViewModel extends ViewModel {
     private final MutableLiveData<Boolean> reservaDeleted = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
-    public ReservasViewModel() {
+    public ReservasViewModel(@NonNull Application application) {
+        super(application);
         repository = DataRepository.getInstance();
     }
 
@@ -69,20 +74,33 @@ public class ReservasViewModel extends ViewModel {
     }
 
     // Crear una nueva reserva
-    public void createReserva(String fecha, Plaza plaza, Hora hora) {
+    public void createReserva(String fecha, Plaza plaza, Hora hora, String vehicleId) {
         String userId = repository.getCurrentUserId();
         if (userId != null) {
-            Reserva reserva = new Reserva(fecha, userId, "", plaza, hora);
+            Reserva reserva = new Reserva(fecha, vehicleId, "", plaza, hora);
             repository.createReserva(userId, reserva, new Callback() {
                 @Override
                 public void onSuccess() {
                     reservaCreated.setValue(true);
                     loadUserReservas(); // Actualizar la lista de reservas
+                    // Programar notificaciones locales
+                    NotificacionReservaScheduler.programarNotificaciones(
+                        getApplication().getApplicationContext(),
+                        fecha,
+                        hora.getHoraInicio(),
+                        String.valueOf(plaza.getId())
+                    );
                 }
 
                 @Override
                 public void onFailure() {
                     errorMessage.setValue("Error al crear la reserva");
+                    reservaCreated.setValue(false);
+                }
+
+                @Override
+                public void onFailure(String errorMessageStr) {
+                    errorMessage.setValue(errorMessageStr);
                     reservaCreated.setValue(false);
                 }
             });
@@ -114,6 +132,12 @@ public class ReservasViewModel extends ViewModel {
                 @Override
                 public void onFailure() {
                     errorMessage.setValue("Error al actualizar la reserva");
+                    reservaUpdated.setValue(false);
+                }
+
+                @Override
+                public void onFailure(String errorMessageStr) {
+                    errorMessage.setValue(errorMessageStr);
                     reservaUpdated.setValue(false);
                 }
             });
