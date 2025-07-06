@@ -4,6 +4,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.work.Worker;
@@ -38,6 +39,7 @@ public class NotificacionReservaWorker extends Worker {
                 .setAutoCancel(true);
 
         manager.notify((int) System.currentTimeMillis(), builder.build());
+        Log.d("NotificacionReserva", "Notificación mostrada: " + title + " - " + message);
         return Result.success();
     }
 }

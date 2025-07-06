@@ -91,10 +91,19 @@ public class SeleccionarPlazaFragment extends Fragment {
             horaFin = getArguments().getLong("horaFin");
             aparcarYa = getArguments().getBoolean("aparcarYa", false);
 
-            // Formatear y mostrar la información de la reserva
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
-            String horaInicioStr = sdf.format(new Date(horaInicio * 1000));
-            String horaFinStr = sdf.format(new Date(horaFin * 1000));
+            // Formatear y mostrar la información de la reserva correctamente
+            SimpleDateFormat sdfFecha = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            Date fechaBase = null;
+            try {
+                fechaBase = sdfFecha.parse(fecha); // fecha es "dd/MM/yyyy"
+            } catch (java.text.ParseException e) {
+                fechaBase = new Date(); // fallback: hoy
+            }
+            Date horaInicioDate = new Date(fechaBase.getTime() + horaInicio * 1000);
+            Date horaFinDate = new Date(fechaBase.getTime() + horaFin * 1000);
+            SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            String horaInicioStr = sdfHora.format(horaInicioDate);
+            String horaFinStr = sdfHora.format(horaFinDate);
 
             String tipoReserva = aparcarYa ? "Aparcar Ya" : "Reserva";
             tvFechaHora.setText(String.format("%s para %s\nEntrada: %s\nSalida: %s",

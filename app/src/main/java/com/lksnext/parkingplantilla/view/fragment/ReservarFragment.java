@@ -242,9 +242,16 @@ public class ReservarFragment extends Fragment {
             int monthEntrada = binding.datePickerEntrada.getMonth() + 1;
             int yearEntrada = binding.datePickerEntrada.getYear();
             String fechaFormatted = String.format("%02d/%02d/%04d", dayEntrada, monthEntrada, yearEntrada);
-            long horaInicioTimestamp = fechaHoraEntrada.getTimeInMillis() / 1000;
-            long horaFinTimestamp = fechaHoraSalida.getTimeInMillis() / 1000;
-            Hora hora = new Hora(horaInicioTimestamp, horaFinTimestamp);
+
+            // Calcular segundos desde medianoche para horaInicio y horaFin
+            Calendar medianoche = (Calendar) fechaHoraEntrada.clone();
+            medianoche.set(Calendar.HOUR_OF_DAY, 0);
+            medianoche.set(Calendar.MINUTE, 0);
+            medianoche.set(Calendar.SECOND, 0);
+            medianoche.set(Calendar.MILLISECOND, 0);
+            long horaInicio = (fechaHoraEntrada.getTimeInMillis() - medianoche.getTimeInMillis()) / 1000;
+            long horaFin = (fechaHoraSalida.getTimeInMillis() - medianoche.getTimeInMillis()) / 1000;
+            Hora hora = new Hora(horaInicio, horaFin);
 
             if (isEditMode) {
                 // Confirmar edición y guardar cambios
@@ -267,7 +274,7 @@ public class ReservarFragment extends Fragment {
                             if (r.getFecha() != null && r.getFecha().equals(fechaFormatted) && r.getHoraInicio() != null) {
                                 long start1 = r.getHoraInicio().getHoraInicio();
                                 long end1 = r.getHoraInicio().getHoraFin();
-                                if (horaInicioTimestamp < end1 && start1 < horaFinTimestamp) {
+                                if (horaInicio < end1 && start1 < horaFin) {
                                     solapada = true;
                                     break;
                                 }
@@ -280,8 +287,8 @@ public class ReservarFragment extends Fragment {
                         Bundle bundle = new Bundle();
                         bundle.putSerializable("selectedVehicle", selectedVehicle);
                         bundle.putString("fecha", fechaFormatted);
-                        bundle.putLong("horaInicio", horaInicioTimestamp);
-                        bundle.putLong("horaFin", horaFinTimestamp);
+                        bundle.putLong("horaInicio", horaInicio);
+                        bundle.putLong("horaFin", horaFin);
                         reservasViewModel.loadAvailablePlazas(fechaFormatted, hora);
                         Navigation.findNavController(requireView()).navigate(
                                 com.lksnext.parkingplantilla.R.id.action_reservarFragment_to_seleccionarPlazaFragment,

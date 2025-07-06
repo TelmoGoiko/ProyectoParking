@@ -149,11 +149,17 @@ public class MisReservasFragment extends Fragment {
                 String horaFin = "N/A";
 
                 if (reservaDominio.getHoraInicio() != null) {
-                    Date dateInicio = new Date(reservaDominio.getHoraInicio().getHoraInicio() * 1000);
-                    Date dateFin = new Date(reservaDominio.getHoraInicio().getHoraFin() * 1000);
-
-                    horaInicio = sdfHora.format(dateInicio);
-                    horaFin = sdfHora.format(dateFin);
+                    try {
+                        SimpleDateFormat sdfFecha = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                        Date fechaBase = sdfFecha.parse(fecha);
+                        Date dateInicio = new Date(fechaBase.getTime() + reservaDominio.getHoraInicio().getHoraInicio() * 1000);
+                        Date dateFin = new Date(fechaBase.getTime() + reservaDominio.getHoraInicio().getHoraFin() * 1000);
+                        horaInicio = sdfHora.format(dateInicio);
+                        horaFin = sdfHora.format(dateFin);
+                    } catch (java.text.ParseException e) {
+                        horaInicio = "?";
+                        horaFin = "?";
+                    }
                 }
 
                 String estado = "Confirmada"; // Por defecto todas las reservas están confirmadas
