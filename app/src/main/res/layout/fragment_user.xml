@@ -40,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Nombre de usuario"
+                android:text="@string/nombre_usuario"
                 android:textColor="#333333"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -51,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="usuario@example.com"
+                android:text="@string/usuario_email_ejemplo"
                 android:textColor="#666666"
                 android:textSize="16sp"
                 android:textAlignment="center" />

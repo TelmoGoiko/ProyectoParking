@@ -74,7 +74,7 @@ public class SeleccionarPlazaFragment extends Fragment {
         // Configurar toolbar
         AppCompatActivity activity = (AppCompatActivity) requireActivity();
         if (activity.getSupportActionBar() != null) {
-            activity.getSupportActionBar().setTitle("Seleccionar Plaza");
+            activity.getSupportActionBar().setTitle(getString(R.string.seleccionar_plaza));
             activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         requireActivity().findViewById(R.id.mainToolbar).setOnClickListener(v ->
@@ -105,8 +105,8 @@ public class SeleccionarPlazaFragment extends Fragment {
             String horaInicioStr = sdfHora.format(horaInicioDate);
             String horaFinStr = sdfHora.format(horaFinDate);
 
-            String tipoReserva = aparcarYa ? "Aparcar Ya" : "Reserva";
-            tvFechaHora.setText(String.format("%s para %s\nEntrada: %s\nSalida: %s",
+            String tipoReserva = aparcarYa ? getString(R.string.aparcar_ya) : getString(R.string.reserva);
+            tvFechaHora.setText(getString(R.string.info_reserva,
                     tipoReserva,
                     selectedVehicle.getName() + " (" + selectedVehicle.getLicensePlate() + ")",
                     horaInicioStr, horaFinStr));
@@ -138,7 +138,7 @@ public class SeleccionarPlazaFragment extends Fragment {
 
         if (plazas == null || plazas.isEmpty()) {
             TextView tvNoPlazas = new TextView(requireContext());
-            tvNoPlazas.setText("No hay plazas disponibles para la fecha y hora seleccionadas");
+            tvNoPlazas.setText(getString(R.string.no_plazas_fecha_hora));
             tvNoPlazas.setPadding(16, 16, 16, 16);
             plazasContainer.addView(tvNoPlazas);
             return;
@@ -149,7 +149,7 @@ public class SeleccionarPlazaFragment extends Fragment {
 
         if (plazasFiltradas.isEmpty()) {
             TextView tvNoPlazas = new TextView(requireContext());
-            tvNoPlazas.setText("No hay plazas disponibles para este tipo de vehículo en la fecha y hora seleccionadas");
+            tvNoPlazas.setText(getString(R.string.no_plazas_tipo_fecha_hora));
             tvNoPlazas.setPadding(16, 16, 16, 16);
             plazasContainer.addView(tvNoPlazas);
             return;
@@ -286,13 +286,13 @@ public class SeleccionarPlazaFragment extends Fragment {
 
     private void confirmarReserva() {
         if (selectedPlaza == null) {
-            Toast.makeText(requireContext(), "Selecciona una plaza primero", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.selecciona_plaza_primero), Toast.LENGTH_SHORT).show();
             return;
         }
 
         // Verificar autenticación a través del ViewModel
         if (!reservasViewModel.isUserAuthenticated()) {
-            Toast.makeText(requireContext(), "No hay usuario autenticado", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.no_usuario_autenticado), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -308,7 +308,7 @@ public class SeleccionarPlazaFragment extends Fragment {
                 // Solo mostrar éxito si no hay error
                 String error = reservasViewModel.getErrorMessage().getValue();
                 if (error == null || error.isEmpty()) {
-                    Toast.makeText(requireContext(), "Reserva creada con éxito", Toast.LENGTH_LONG).show();
+                    Toast.makeText(requireContext(), getString(R.string.reserva_creada_exito), Toast.LENGTH_LONG).show();
                     Navigation.findNavController(requireView()).navigate(R.id.action_seleccionarPlazaFragment_to_misReservasFragment);
                 }
             }

@@ -20,7 +20,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Selecciona la fecha y hora de salida para tu aparcamiento."
+                android:text="@string/selecciona_fecha_hora_salida"
                 android:textColor="#1976D2"
                 android:textSize="16sp"
                 android:layout_marginBottom="16dp" />
@@ -28,7 +28,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Fecha de salida"
+                android:text="@string/fecha_salida"
                 android:textStyle="bold"
                 android:layout_marginTop="8dp" />
             <DatePicker
@@ -39,7 +39,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hora de salida"
+                android:text="@string/hora_salida"
                 android:textStyle="bold"
                 android:layout_marginTop="8dp" />
             <TimePicker
@@ -51,7 +51,7 @@
                 android:id="@+id/btnContinuarAparcarYa"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Continuar"
+                android:text="@string/continuar"
                 android:backgroundTint="#1976D2"
                 android:textColor="@android:color/white"
                 android:layout_marginTop="24dp" />

@@ -38,7 +38,7 @@ public class AparcarYaFragment extends Fragment {
         // Use the shared Toolbar from MainActivity
         AppCompatActivity activity = (AppCompatActivity) requireActivity();
         if (activity.getSupportActionBar() != null) {
-            activity.getSupportActionBar().setTitle("Aparcar Ya");
+            activity.getSupportActionBar().setTitle(getString(R.string.aparcar_ya));
             activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         requireActivity().findViewById(R.id.mainToolbar).setOnClickListener(v ->
@@ -88,13 +88,13 @@ public class AparcarYaFragment extends Fragment {
                 binding.datePickerSalida.updateDate(nuevaSalida.get(Calendar.YEAR), nuevaSalida.get(Calendar.MONTH), nuevaSalida.get(Calendar.DAY_OF_MONTH));
                 binding.timePickerSalida.setHour(nuevaSalida.get(Calendar.HOUR_OF_DAY));
                 binding.timePickerSalida.setMinute(nuevaSalida.get(Calendar.MINUTE));
-                Toast.makeText(getContext(), "La estancia no puede superar las 8 horas", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.estancia_no_supera_8h), Toast.LENGTH_SHORT).show();
             }
         });
 
         binding.btnContinuarAparcarYa.setOnClickListener(v -> {
             if (selectedVehicle == null) {
-                Toast.makeText(getContext(), "No se ha recibido vehículo seleccionado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.no_vehiculo_seleccionado), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -123,20 +123,20 @@ public class AparcarYaFragment extends Fragment {
             fechaSeleccionada.set(binding.datePickerSalida.getYear(), binding.datePickerSalida.getMonth(), binding.datePickerSalida.getDayOfMonth(), 0, 0, 0);
             fechaSeleccionada.set(Calendar.MILLISECOND, 0);
             if (fechaSeleccionada.before(hoy) || fechaSeleccionada.after(maxFecha)) {
-                Toast.makeText(getContext(), "Solo puedes aparcar hasta 7 días naturales desde hoy.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.solo_aparcar_7dias), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             // Verificar que la fecha/hora de salida sea posterior a la actual
             if (fechaHoraSalida.before(fechaHoraEntrada) || fechaHoraSalida.equals(fechaHoraEntrada)) {
-                Toast.makeText(getContext(), "La fecha y hora de salida debe ser posterior a la actual", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.salida_posterior_actual), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             // Validar que la diferencia entre entrada y salida no supere 8 horas
             long diffMillisHoras = fechaHoraSalida.getTimeInMillis() - fechaHoraEntrada.getTimeInMillis();
             if (diffMillisHoras > 8 * 60 * 60 * 1000) {
-                Toast.makeText(getContext(), "La estancia no puede superar las 8 horas.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.estancia_no_supera_8h), Toast.LENGTH_SHORT).show();
                 return;
             }
 

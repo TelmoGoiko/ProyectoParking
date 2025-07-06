@@ -1,6 +1,9 @@
 package com.lksnext.parkingplantilla.view.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -13,6 +16,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.lksnext.parkingplantilla.R;
 import com.lksnext.parkingplantilla.data.DataRepository;
 import com.lksnext.parkingplantilla.databinding.ActivityRegisterBinding;
 import com.lksnext.parkingplantilla.domain.Callback;
@@ -44,7 +48,7 @@ public class RegisterActivity extends AppCompatActivity {
         registerViewModel.isRegistered().observe(this, isRegistered -> {
             if (isRegistered == null) return;
             if (isRegistered) {
-                android.widget.Toast.makeText(this, "Registro completado. Ahora puedes iniciar sesión.", android.widget.Toast.LENGTH_LONG).show();
+                android.widget.Toast.makeText(this, getString(R.string.registro_completado), android.widget.Toast.LENGTH_LONG).show();
                 finish(); // Cierra la pantalla y vuelve al login
             }
         });
@@ -71,10 +75,10 @@ public class RegisterActivity extends AppCompatActivity {
             String username = binding.editTextUsername.getText().toString().trim();
 
             if (email.isEmpty() || password.isEmpty() || checkPassword.isEmpty() || username.isEmpty()) {
-                binding.emailLayout.setError(email.isEmpty() ? "Campo requerido" : null);
-                binding.passwordLayout.setError(password.isEmpty() ? "Campo requerido" : null);
-                binding.checkPasswordLayout.setError(checkPassword.isEmpty() ? "Campo requerido" : null);
-                binding.usernameLayout.setError(username.isEmpty() ? "Campo requerido" : null);
+                binding.emailLayout.setError(email.isEmpty() ? getString(R.string.campo_requerido) : null);
+                binding.passwordLayout.setError(password.isEmpty() ? getString(R.string.campo_requerido) : null);
+                binding.checkPasswordLayout.setError(checkPassword.isEmpty() ? getString(R.string.campo_requerido) : null);
+                binding.usernameLayout.setError(username.isEmpty() ? getString(R.string.campo_requerido) : null);
                 return;
             }
             binding.emailLayout.setError(null);
@@ -83,7 +87,7 @@ public class RegisterActivity extends AppCompatActivity {
             binding.usernameLayout.setError(null);
 
             if (!password.equals(checkPassword)) {
-                binding.checkPasswordLayout.setError("Las contraseñas no coinciden");
+                binding.checkPasswordLayout.setError(getString(R.string.contrasenas_no_coinciden));
                 return;
             }
             binding.checkPasswordLayout.setError(null);
@@ -119,7 +123,7 @@ public class RegisterActivity extends AppCompatActivity {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 handleGoogleSignIn(account);
             } catch (ApiException e) {
-                Toast.makeText(this, "Error en Google Sign-In: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.error_google_signin, e.getMessage()), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -135,8 +139,36 @@ public class RegisterActivity extends AppCompatActivity {
 
             @Override
             public void onFailure() {
-                Toast.makeText(RegisterActivity.this, "Error autenticando con Google", Toast.LENGTH_LONG).show();
+                Toast.makeText(RegisterActivity.this, getString(R.string.error_autenticando_google), Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(updateLocale(newBase));
+    }
+
+    private static Context updateLocale(Context context) {
+        android.content.SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(context);
+        String langCode = prefs.getString("app_language", java.util.Locale.getDefault().getLanguage());
+        java.util.Locale locale;
+        if (langCode.contains("-")) {
+            String[] parts = langCode.split("-");
+            locale = new java.util.Locale.Builder().setLanguage(parts[0]).setRegion(parts[1]).build();
+        } else {
+            locale = new java.util.Locale.Builder().setLanguage(langCode).build();
+        }
+        java.util.Locale.setDefault(locale);
+        Resources res = context.getResources();
+        Configuration config = res.getConfiguration();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale);
+            return context.createConfigurationContext(config);
+        } else {
+            config.locale = locale;
+            res.updateConfiguration(config, res.getDisplayMetrics());
+            return context;
+        }
     }
 }

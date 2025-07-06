@@ -1,7 +1,11 @@
 package com.lksnext.parkingplantilla.view.activity;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -17,6 +21,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.lksnext.parkingplantilla.R;
 import com.lksnext.parkingplantilla.data.DataRepository;
 import com.lksnext.parkingplantilla.databinding.ActivityLoginBinding;
 import com.lksnext.parkingplantilla.domain.Callback;
@@ -50,7 +55,7 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             } else {
-                binding.usernameLayout.setError("Error en el login: credenciales incorrectas o usuario no existe");
+                binding.usernameLayout.setError(getString(R.string.error_login_credenciales));
             }
         });
 
@@ -61,8 +66,8 @@ public class LoginActivity extends AppCompatActivity {
             binding.usernameLayout.setError(null);
             binding.passwordLayout.setError(null);
             if (email.isEmpty() || password.isEmpty()) {
-                if (email.isEmpty()) binding.usernameLayout.setError("Campo requerido");
-                if (password.isEmpty()) binding.passwordLayout.setError("Campo requerido");
+                if (email.isEmpty()) binding.usernameLayout.setError(getString(R.string.campo_requerido));
+                if (password.isEmpty()) binding.passwordLayout.setError(getString(R.string.campo_requerido));
                 return;
             }
             loginViewModel.loginUser(email, password);
@@ -77,30 +82,30 @@ public class LoginActivity extends AppCompatActivity {
         //Acción para recuperar contraseña
         binding.forgotPassword.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Recuperar contraseña");
+            builder.setTitle(getString(R.string.recuperar_contrasena));
             final EditText input = new EditText(this);
-            input.setHint("Introduce tu email");
+            input.setHint(getString(R.string.introduce_email));
             builder.setView(input);
-            builder.setPositiveButton("Enviar", (dialog, which) -> {
+            builder.setPositiveButton(getString(R.string.enviar), (dialog, which) -> {
                 String email = input.getText().toString().trim();
                 if (email.isEmpty()) {
-                    Toast.makeText(this, "Introduce un email válido", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.introduce_email_valido), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 repository.sendPasswordResetEmail(email, new Callback() {
                     @Override
                     public void onSuccess() {
-                        Toast.makeText(LoginActivity.this, "Correo de recuperación enviado", Toast.LENGTH_LONG).show();
+                        Toast.makeText(LoginActivity.this, getString(R.string.correo_recuperacion_enviado), Toast.LENGTH_LONG).show();
                     }
 
                     @Override
                     public void onFailure() {
-                        Toast.makeText(LoginActivity.this, "Error al enviar el correo de recuperación", Toast.LENGTH_LONG).show();
+                        Toast.makeText(LoginActivity.this, getString(R.string.error_enviar_correo_recuperacion), Toast.LENGTH_LONG).show();
                     }
                 });
             });
-            builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.cancel());
+            builder.setNegativeButton(getString(R.string.cancelar), (dialog, which) -> dialog.cancel());
             builder.show();
         });
 
@@ -126,7 +131,7 @@ public class LoginActivity extends AppCompatActivity {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 handleGoogleSignIn(account);
             } catch (ApiException e) {
-                Toast.makeText(this, "Error en Google Sign-In: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.error_google_signin, e.getMessage()), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -142,8 +147,36 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure() {
-                Toast.makeText(LoginActivity.this, "Error autenticando con Google", Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, getString(R.string.error_autenticando_google), Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(updateLocale(newBase));
+    }
+
+    private static Context updateLocale(Context context) {
+        SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(context);
+        String langCode = prefs.getString("app_language", java.util.Locale.getDefault().getLanguage());
+        java.util.Locale locale;
+        if (langCode.contains("-")) {
+            String[] parts = langCode.split("-");
+            locale = new java.util.Locale.Builder().setLanguage(parts[0]).setRegion(parts[1]).build();
+        } else {
+            locale = new java.util.Locale.Builder().setLanguage(langCode).build();
+        }
+        java.util.Locale.setDefault(locale);
+        Resources res = context.getResources();
+        Configuration config = res.getConfiguration();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale);
+            return context.createConfigurationContext(config);
+        } else {
+            config.locale = locale;
+            res.updateConfiguration(config, res.getDisplayMetrics());
+            return context;
+        }
     }
 }

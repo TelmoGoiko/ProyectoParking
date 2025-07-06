@@ -2,22 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/mainMenuFragment"
-        android:title="Menú"
+        android:title="@string/menu_inicio"
         android:icon="@drawable/ic_home_foreground"/>
     <item
         android:id="@+id/userFragment"
-        android:title="Mi Perfil"
+        android:title="@string/menu_perfil"
         android:icon="@drawable/ic_person_foreground"/>
     <item
         android:id="@+id/reservarFragment"
-        android:title="Reservar"
+        android:title="@string/menu_reservar"
         android:icon="@drawable/ic_reservations_foreground"/>
     <item
         android:id="@+id/misReservasFragment"
-        android:title="Mis Reservas"
+        android:title="@string/menu_mis_reservas"
         android:icon="@drawable/ic_reservations_foreground"/>
     <item
         android:id="@+id/misVehiculosFragment"
-        android:title="Mis Vehículos"
+        android:title="@string/menu_mis_vehiculos"
         android:icon="@drawable/ic_vehicles_foreground"/>
 </menu>

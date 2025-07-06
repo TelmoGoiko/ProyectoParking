@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import com.lksnext.parkingplantilla.R;
 import com.lksnext.parkingplantilla.databinding.FragmentUserBinding;
 import com.lksnext.parkingplantilla.view.activity.LoginActivity;
 import com.lksnext.parkingplantilla.viewmodel.ProfileViewModel;
@@ -65,7 +66,7 @@ public class UserFragment extends Fragment {
         // Use the shared Toolbar from MainActivity
         AppCompatActivity activity = (AppCompatActivity) requireActivity();
         if (activity.getSupportActionBar() != null) {
-            activity.getSupportActionBar().setTitle("Perfil de Usuario");
+            activity.getSupportActionBar().setTitle(getString(R.string.perfil_usuario));
             activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         requireActivity().findViewById(com.lksnext.parkingplantilla.R.id.mainToolbar).setOnClickListener(v ->

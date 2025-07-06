@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import com.lksnext.parkingplantilla.R;
 import com.lksnext.parkingplantilla.databinding.FragmentReservarBinding;
 import com.lksnext.parkingplantilla.domain.Hora;
 import com.lksnext.parkingplantilla.model.Vehicle;
@@ -40,7 +41,7 @@ public class ReservarFragment extends Fragment {
         // Use the shared Toolbar from MainActivity
         AppCompatActivity activity = (AppCompatActivity) requireActivity();
         if (activity.getSupportActionBar() != null) {
-            activity.getSupportActionBar().setTitle("Reservar");
+            activity.getSupportActionBar().setTitle(getString(R.string.editar_reserva));
             activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         requireActivity().findViewById(com.lksnext.parkingplantilla.R.id.mainToolbar).setOnClickListener(v ->
@@ -58,40 +59,10 @@ public class ReservarFragment extends Fragment {
         // Mostrar aviso y cambiar texto del botón si es edición
         if (isEditMode) {
             binding.tvEditandoReserva.setVisibility(View.VISIBLE);
-            binding.btnContinuarReserva.setText("Confirmar edición");
-            // Cargar datos de la reserva
-            reservasViewModel.getReservaById(reservaIdEdit);
-            reservasViewModel.getSelectedReserva().observe(getViewLifecycleOwner(), reserva -> {
-                if (reserva != null) {
-                    // Precargar datos en los campos
-                    String[] fechaParts = reserva.getFecha().split("/");
-                    if (fechaParts.length == 3) {
-                        binding.datePickerEntrada.updateDate(
-                            Integer.parseInt(fechaParts[2]),
-                            Integer.parseInt(fechaParts[1]) - 1,
-                            Integer.parseInt(fechaParts[0])
-                        );
-                        binding.datePickerSalida.updateDate(
-                            Integer.parseInt(fechaParts[2]),
-                            Integer.parseInt(fechaParts[1]) - 1,
-                            Integer.parseInt(fechaParts[0])
-                        );
-                    }
-                    if (reserva.getHoraInicio() != null) {
-                        java.util.Calendar calEntrada = java.util.Calendar.getInstance();
-                        calEntrada.setTimeInMillis(reserva.getHoraInicio().getHoraInicio() * 1000);
-                        binding.timePickerEntrada.setHour(calEntrada.get(java.util.Calendar.HOUR_OF_DAY));
-                        binding.timePickerEntrada.setMinute(calEntrada.get(java.util.Calendar.MINUTE));
-                        java.util.Calendar calSalida = java.util.Calendar.getInstance();
-                        calSalida.setTimeInMillis(reserva.getHoraInicio().getHoraFin() * 1000);
-                        binding.timePickerSalida.setHour(calSalida.get(java.util.Calendar.HOUR_OF_DAY));
-                        binding.timePickerSalida.setMinute(calSalida.get(java.util.Calendar.MINUTE));
-                    }
-                }
-            });
+            binding.btnContinuarReserva.setText(getString(R.string.confirmar_edicion));
         } else {
             binding.tvEditandoReserva.setVisibility(View.GONE);
-            binding.btnContinuarReserva.setText("Continuar");
+            binding.btnContinuarReserva.setText(getString(R.string.continuar));
         }
 
         // Obtener vehículo seleccionado de argumentos
@@ -150,7 +121,7 @@ public class ReservarFragment extends Fragment {
                 binding.datePickerSalida.updateDate(nuevaSalida.get(Calendar.YEAR), nuevaSalida.get(Calendar.MONTH), nuevaSalida.get(Calendar.DAY_OF_MONTH));
                 binding.timePickerSalida.setHour(nuevaSalida.get(Calendar.HOUR_OF_DAY));
                 binding.timePickerSalida.setMinute(nuevaSalida.get(Calendar.MINUTE));
-                Toast.makeText(getContext(), "La reserva no puede superar las 8 horas", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.reserva_no_supera_8h), Toast.LENGTH_SHORT).show();
             }
         });
         binding.timePickerSalida.setOnTimeChangedListener((view12, hourOfDay, minute) -> {
@@ -172,13 +143,13 @@ public class ReservarFragment extends Fragment {
                 binding.datePickerSalida.updateDate(nuevaSalida.get(Calendar.YEAR), nuevaSalida.get(Calendar.MONTH), nuevaSalida.get(Calendar.DAY_OF_MONTH));
                 binding.timePickerSalida.setHour(nuevaSalida.get(Calendar.HOUR_OF_DAY));
                 binding.timePickerSalida.setMinute(nuevaSalida.get(Calendar.MINUTE));
-                Toast.makeText(getContext(), "La reserva no puede superar las 8 horas", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.reserva_no_supera_8h), Toast.LENGTH_SHORT).show();
             }
         });
 
         binding.btnContinuarReserva.setOnClickListener(v -> {
             if (selectedVehicle == null && !isEditMode) {
-                Toast.makeText(getContext(), "No se ha recibido vehículo seleccionado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.no_vehiculo_seleccionado), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -186,7 +157,7 @@ public class ReservarFragment extends Fragment {
             if (isEditMode) {
                 reservasViewModel.getSelectedReserva().observe(getViewLifecycleOwner(), reservaObs -> {
                     if (reservaObs != null && reservaObs.getEstado() != null && !"pendiente".equalsIgnoreCase(reservaObs.getEstado())) {
-                        Toast.makeText(getContext(), "Solo se puede editar una reserva pendiente (antes de su inicio)", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.solo_editar_reserva_pendiente), Toast.LENGTH_LONG).show();
                         return;
                     }
 
@@ -211,14 +182,14 @@ public class ReservarFragment extends Fragment {
 
                     // Verificar que la fecha/hora de entrada sea anterior a la de salida
                     if (fechaHoraEntrada.after(fechaHoraSalida)) {
-                        Toast.makeText(getContext(), "La fecha y hora de entrada debe ser anterior a la de salida", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getString(R.string.entrada_antes_salida), Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                     // Verificar que la fecha/hora de entrada sea posterior a la actual
                     Calendar ahora = Calendar.getInstance();
                     if (fechaHoraEntrada.before(ahora)) {
-                        Toast.makeText(getContext(), "La fecha y hora de entrada debe ser posterior a la actual", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getString(R.string.entrada_posterior_actual), Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -234,14 +205,14 @@ public class ReservarFragment extends Fragment {
                     fechaSeleccionada.set(binding.datePickerEntrada.getYear(), binding.datePickerEntrada.getMonth(), binding.datePickerEntrada.getDayOfMonth(), 0, 0, 0);
                     fechaSeleccionada.set(Calendar.MILLISECOND, 0);
                     if (fechaSeleccionada.before(hoy) || fechaSeleccionada.after(maxFecha)) {
-                        Toast.makeText(getContext(), "Solo puedes reservar desde hoy hasta 7 días naturales.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getString(R.string.reservar_hasta_7dias), Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                     // Validar que la diferencia entre entrada y salida no supere 8 horas
                     long diffMillisHoras = fechaHoraSalida.getTimeInMillis() - fechaHoraEntrada.getTimeInMillis();
                     if (diffMillisHoras > 8 * 60 * 60 * 1000) {
-                        Toast.makeText(getContext(), "La reserva no puede superar las 8 horas.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getString(R.string.reserva_no_supera_8h), Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -265,7 +236,7 @@ public class ReservarFragment extends Fragment {
                     reservaObs.setFecha(fechaFormatted);
                     reservaObs.setHoraInicio(hora);
                     reservasViewModel.updateReserva(reservaObs);
-                    Toast.makeText(getContext(), "Reserva actualizada", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.reserva_actualizada), Toast.LENGTH_SHORT).show();
                     requireActivity().onBackPressed();
                 });
                 return;
@@ -292,14 +263,14 @@ public class ReservarFragment extends Fragment {
 
             // Verificar que la fecha/hora de entrada sea anterior a la de salida
             if (fechaHoraEntrada.after(fechaHoraSalida)) {
-                Toast.makeText(getContext(), "La fecha y hora de entrada debe ser anterior a la de salida", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.entrada_antes_salida), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             // Verificar que la fecha/hora de entrada sea posterior a la actual
             Calendar ahora = Calendar.getInstance();
             if (fechaHoraEntrada.before(ahora)) {
-                Toast.makeText(getContext(), "La fecha y hora de entrada debe ser posterior a la actual", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.entrada_posterior_actual), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -315,14 +286,14 @@ public class ReservarFragment extends Fragment {
             fechaSeleccionada.set(binding.datePickerEntrada.getYear(), binding.datePickerEntrada.getMonth(), binding.datePickerEntrada.getDayOfMonth(), 0, 0, 0);
             fechaSeleccionada.set(Calendar.MILLISECOND, 0);
             if (fechaSeleccionada.before(hoy) || fechaSeleccionada.after(maxFecha)) {
-                Toast.makeText(getContext(), "Solo puedes reservar desde hoy hasta 7 días naturales.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.reservar_hasta_7dias), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             // Validar que la diferencia entre entrada y salida no supere 8 horas
             long diffMillisHoras = fechaHoraSalida.getTimeInMillis() - fechaHoraEntrada.getTimeInMillis();
             if (diffMillisHoras > 8 * 60 * 60 * 1000) {
-                Toast.makeText(getContext(), "La reserva no puede superar las 8 horas.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.reserva_no_supera_8h), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -349,7 +320,7 @@ public class ReservarFragment extends Fragment {
                         reserva.setFecha(fechaFormatted);
                         reserva.setHoraInicio(hora);
                         reservasViewModel.updateReserva(reserva);
-                        Toast.makeText(getContext(), "Reserva actualizada", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getString(R.string.reserva_actualizada), Toast.LENGTH_SHORT).show();
                         requireActivity().onBackPressed();
                     }
                 });
@@ -371,7 +342,7 @@ public class ReservarFragment extends Fragment {
                         }
                     }
                     if (solapada) {
-                        Toast.makeText(getContext(), "Ya tienes una reserva en ese rango de horas.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.reserva_solapada), Toast.LENGTH_LONG).show();
                     } else {
                         Bundle bundle = new Bundle();
                         bundle.putSerializable("selectedVehicle", selectedVehicle);

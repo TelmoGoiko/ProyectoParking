@@ -13,6 +13,8 @@
     <string name="google">Google</string>
     <string name="facebook">Facebook</string>
     <string name="no_tienes_cuenta_reg_strate">¿No tienes cuenta? Regístrate</string>
+    <string name="registrarse">Registrarse</string>
+    <string name="ya_tienes_cuenta">¿Ya tienes cuenta? Inicia sesión</string>
 
     <!-- Strings para MisReservasActivity y EditarReservaActivity -->
     <string name="mis_reservas">Mis Reservas</string>
@@ -25,7 +27,6 @@
     <string name="hora_fin">Hora Fin:</string>
     <string name="estado">Estado:</string>
     <string name="guardar_cambios">Guardar Cambios</string>
-    <string name="eliminar">Eliminar</string>
     <string name="editar">Editar</string>
     <string name="eliminar_reserva_titulo">Eliminar reserva</string>
     <string name="eliminar_reserva_mensaje">¿Estás seguro de que deseas eliminar esta reserva?</string>
@@ -37,4 +38,139 @@
     <string name="cambiar_contrasena">Cambiar contraseña</string>
     <string name="idioma">Idioma</string>
     <string name="cerrar_sesion">Cerrar sesión</string>
+
+    <!-- Textos extraídos de layouts y código -->
+    <string name="selecciona_fecha_hora_salida">Selecciona la fecha y hora de salida para tu aparcamiento.</string>
+    <string name="fecha_salida">Fecha de salida</string>
+    <string name="hora_salida">Hora de salida</string>
+    <string name="continuar">Continuar</string>
+    <string name="selecciona_fecha_hora_entrada_salida">Selecciona la fecha y hora de entrada y salida para tu reserva.</string>
+    <string name="fecha_entrada">Fecha de entrada</string>
+    <string name="hora_entrada">Hora de entrada</string>
+    <string name="editando_reserva">Editando reserva</string>
+    <string name="anadir_editar_vehiculo">Añadir/Editar Vehículo</string>
+    <string name="nombre_apodo">Nombre o apodo</string>
+    <string name="matricula">Matrícula</string>
+    <string name="marca">Marca</string>
+    <string name="modelo">Modelo</string>
+    <string name="vehiculo_electrico">¿Vehículo eléctrico?</string>
+    <string name="para_minusvalidos">¿Para minusválidos?</string>
+    <string name="guardar">Guardar</string>
+    <string name="eliminar_vehiculo_titulo">¿Eliminar vehículo?</string>
+    <string name="eliminar_vehiculo_mensaje">¿Estás seguro de que quieres eliminar este vehículo?</string>
+    <string name="iniciar_sesion">Iniciar sesión</string>
+    <string name="olvidaste_contrasena">¿Olvidaste tu contraseña?</string>
+    <string name="usuario_email">Usuario o email</string>
+    <string name="o">O</string>
+    <string name="repetir_contrasena">Repetir contraseña</string>
+    <string name="nuevo_usuario">Nombre de usuario</string>
+    <string name="correo_electronico">Correo electrónico</string>
+    <string name="contrasena">Contraseña</string>
+    <string name="logo_text">APParking</string>
+    <string name="confirmar_edicion">Confirmar edición</string>
+    <string name="reserva_no_supera_8h">La reserva no puede superar las 8 horas</string>
+    <string name="solo_editar_reserva_pendiente">Solo se puede editar una reserva Confirmada (antes de su inicio)</string>
+    <string name="entrada_antes_salida">La fecha y hora de entrada debe ser anterior a la de salida</string>
+    <string name="entrada_posterior_actual">La fecha y hora de entrada debe ser posterior a la actual</string>
+    <string name="reservar_hasta_7dias">Solo puedes reservar desde hoy hasta 7 días naturales.</string>
+    <string name="reserva_actualizada">Reserva actualizada</string>
+    <string name="reserva_solapada">Ya tienes una reserva en ese rango de horas.</string>
+    <string name="seleccionar_plaza">Seleccionar Plaza</string>
+    <string name="aparcar_ya">Aparcar Ya</string>
+    <string name="reserva">Reserva</string>
+    <string name="info_reserva">%1$s para %2$s\nEntrada: %3$s\nSalida: %4$s</string>
+    <string name="no_plazas_fecha_hora">No hay plazas disponibles para la fecha y hora seleccionadas</string>
+    <string name="no_plazas_tipo_fecha_hora">No hay plazas disponibles para este tipo de vehículo en la fecha y hora seleccionadas</string>
+    <string name="perfil_usuario">Perfil de Usuario</string>
+    <string name="mis_vehiculos">Mis Vehículos</string>
+    <string name="no_usuario_autenticado">No hay usuario autenticado</string>
+    <string name="eliminar_reserva">Eliminar reserva</string>
+    <string name="eliminar_reserva_confirmacion">¿Estás seguro de que quieres eliminar esta reserva?</string>
+    <string name="eliminar">Eliminar</string>
+    <string name="elegir_tipo_reserva">Elegir tipo de reserva</string>
+    <string name="selecciona_un_vehiculo">Selecciona un vehículo</string>
+    <string name="inicio">Inicio</string>
+    <string name="error_identificar_reserva">Error al identificar la reserva</string>
+
+    <!-- Textos del menú inferior -->
+    <string name="menu_inicio">Inicio</string>
+    <string name="menu_perfil">Mi Perfil</string>
+    <string name="menu_reservar">Reservar</string>
+    <string name="menu_mis_reservas">Mis Reservas</string>
+    <string name="menu_mis_vehiculos">Mis Vehículos</string>
+
+    <!-- Toasts de SeleccionarPlazaFragment -->
+    <string name="selecciona_plaza_primero">Selecciona una plaza primero</string>
+    <string name="reserva_creada_exito">Reserva creada con éxito</string>
+    <string name="vehiculo_eliminado">Vehículo eliminado</string>
+    <string name="error_eliminar_vehiculo">Error al eliminar el vehículo</string>
+
+    <!-- Toasts y mensajes AnadirEditarVehiculoFragment -->
+    <string name="error_cargando_marcas">Error cargando marcas: %1$s</string>
+    <string name="marcas_recibidas">Marcas recibidas: %1$d</string>
+    <string name="error_cargando_modelos">Error cargando modelos: %1$s</string>
+    <string name="modelos_recibidos">Modelos recibidos: %1$d</string>
+    <string name="error_cargando_electricos">Error cargando eléctricos: %1$s</string>
+    <string name="no_versiones_electricas">No hay versiones eléctricas para este modelo</string>
+    <string name="selecciona_version_electrica">Selecciona versión eléctrica</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="error_cargando_motos">Error cargando motos: %1$s</string>
+    <string name="matricula_no_valida">Matrícula no válida. Debe tener 4 números y 3 consonantes mayúsculas (ej: 1234BCD)</string>
+    <string name="completa_todos_los_campos">Completa todos los campos</string>
+    <string name="vehiculo_guardado">Vehículo guardado</string>
+    <string name="error_guardar_vehiculo">Error al guardar vehículo</string>
+
+    <!-- Toasts y mensajes AparcarYaFragment -->
+    <string name="estancia_no_supera_8h">La estancia no puede superar las 8 horas</string>
+    <string name="no_vehiculo_seleccionado">No se ha recibido vehículo seleccionado</string>
+    <string name="solo_aparcar_7dias">Solo puedes aparcar hasta 7 días naturales desde hoy.</string>
+    <string name="salida_posterior_actual">La fecha y hora de salida debe ser posterior a la actual</string>
+
+    <!-- Títulos para Añadir y Editar Vehículo -->
+    <string name="anadir_vehiculo">Añadir Vehículo</string>
+    <string name="editar_vehiculo">Editar Vehículo</string>
+
+    <!-- Mensajes de error, éxito y otros para Login, Register y RecoverPassword -->
+    <string name="registro_completado">Registro completado. Ahora puedes iniciar sesión.</string>
+    <string name="campo_requerido">Campo requerido</string>
+    <string name="contrasenas_no_coinciden">Las contraseñas no coinciden</string>
+    <string name="error_login_credenciales">Error en el login: credenciales incorrectas o usuario no existe</string>
+    <string name="recuperar_contrasena">Recuperar contraseña</string>
+    <string name="introduce_email">Introduce tu email</string>
+    <string name="enviar">Enviar</string>
+    <string name="introduce_email_valido">Introduce un email válido</string>
+    <string name="correo_recuperacion_enviado">Correo de recuperación enviado</string>
+    <string name="error_enviar_correo_recuperacion">Error al enviar el correo de recuperación</string>
+    <string name="error_google_signin">Error en Google Sign-In: %1$s</string>
+    <string name="error_autenticando_google">Error autenticando con Google</string>
+    <string name="enlace_recuperacion_enviado">Enlace de recuperación enviado</string>
+    <string name="introduce_correo_electronico">Introduce tu correo electrónico</string>
+    <string name="no_vehiculos_registrados">No tienes vehículos registrados</string>
+    <string name="anadir_vehiculo_btn">Añadir vehículo</string>
+    <string name="nombre_usuario">Nombre de usuario</string>
+    <string name="usuario_email_ejemplo">usuario@example.com</string>
+    <string name="selecciona_tu_plaza">Selecciona tu plaza de aparcamiento</string>
+    <string name="datos_reserva">Datos de la reserva</string>
+    <string name="confirmar_reserva">Confirmar Reserva</string>
+    <string name="volver_al_login">Volver al login</string>
+    <string name="selecciona_tu_vehiculo">Selecciona tu vehículo</string>
+    <string name="reservar_titulo">RESERVAR</string>
+    <string name="reservar_explicacion">Elige fecha y hora de entrada/salida</string>
+    <string name="aparcar_ya_titulo">APARCAR YA</string>
+    <string name="correo_electronico_hint">Correo electrónico</string>
+    <string name="recuperar_instruccion">Introduce tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.</string>
+    <string name="plazas_coche">Plazas coche</string>
+    <string name="enviar_enlace">Enviar enlace</string>
+    <string name="codigo_verificacion">Código de verificación</string>
+    <string name="nueva_contrasena">Nueva contraseña</string>
+    <string name="volver_a_introducir_correo">Volver a introducir el correo</string>
+    <string name="aparcar_ya_explicacion">Entrada ahora, salida a elegir</string>
+    <string name="mi_perfil">Mi Perfil</string>
+    <string name="plazas_coche_electrico">Plazas coche eléctrico</string>
+    <string name="plazas_coche_minusvalido">Plazas coche minusválido</string>
+    <string name="plazas_coche_minusvalido_electrico">Plazas coche minusválido eléctrico</string>
+    <string name="plazas_moto">Plazas moto</string>
+    <string name="plazas_moto_minusvalida">Plazas moto minusválida</string>
+    <string name="tipo_coche">Coche</string>
+    <string name="tipo_moto">Moto</string>
 </resources>

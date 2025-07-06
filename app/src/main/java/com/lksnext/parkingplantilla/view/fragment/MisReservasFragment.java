@@ -50,7 +50,7 @@ public class MisReservasFragment extends Fragment {
         // Use the shared Toolbar from MainActivity
         AppCompatActivity activity = (AppCompatActivity) requireActivity();
         if (activity.getSupportActionBar() != null) {
-            activity.getSupportActionBar().setTitle("Mis Reservas");
+            activity.getSupportActionBar().setTitle(getString(R.string.mis_reservas));
             activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         requireActivity().findViewById(R.id.mainToolbar).setOnClickListener(v -> requireActivity().onBackPressed());
@@ -74,26 +74,26 @@ public class MisReservasFragment extends Fragment {
                     androidx.navigation.Navigation.findNavController(requireView())
                         .navigate(R.id.action_misReservasFragment_to_reservarFragment, bundle);
                 } else {
-                    Toast.makeText(getContext(), "Error al identificar la reserva", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.error_identificar_reserva), Toast.LENGTH_SHORT).show();
                 }
             },
             // OnClick listener para eliminar
             reserva -> {
                 // Mostrar diálogo de confirmación
                 new AlertDialog.Builder(requireContext())
-                    .setTitle("Eliminar reserva")
-                    .setMessage("¿Estás seguro de que quieres eliminar esta reserva?")
-                    .setPositiveButton("Eliminar", (dialog, which) -> {
+                    .setTitle(getString(R.string.eliminar_reserva))
+                    .setMessage(getString(R.string.eliminar_reserva_confirmacion))
+                    .setPositiveButton(getString(R.string.eliminar), (dialog, which) -> {
                         // Obtener el ID real de la reserva desde nuestro mapa
                         String reservaId = reservasIdMap.get(reserva);
                         if (reservaId != null) {
                             // Eliminar la reserva usando el ViewModel (que a su vez usará el Repository)
                             eliminarReserva(reservaId);
                         } else {
-                            Toast.makeText(requireContext(), "Error al identificar la reserva", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), getString(R.string.error_identificar_reserva), Toast.LENGTH_SHORT).show();
                         }
                     })
-                    .setNegativeButton("Cancelar", null)
+                    .setNegativeButton(getString(R.string.cancelar), null)
                     .show();
                 return true;
             });
@@ -107,7 +107,7 @@ public class MisReservasFragment extends Fragment {
     private void cargarReservasDeUsuario() {
         // Verificar si hay un usuario autenticado usando el ViewModel
         if (!reservasViewModel.isUserAuthenticated()) {
-            Toast.makeText(getContext(), "No hay usuario autenticado", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.no_usuario_autenticado), Toast.LENGTH_SHORT).show();
             return;
         }
 

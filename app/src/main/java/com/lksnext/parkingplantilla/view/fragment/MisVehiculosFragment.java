@@ -38,7 +38,7 @@ public class MisVehiculosFragment extends Fragment implements VehicleAdapter.OnV
         super.onViewCreated(view, savedInstanceState);
         AppCompatActivity activity = (AppCompatActivity) requireActivity();
         if (activity.getSupportActionBar() != null) {
-            activity.getSupportActionBar().setTitle("Mis Vehículos");
+            activity.getSupportActionBar().setTitle(getString(R.string.mis_vehiculos));
             activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         requireActivity().findViewById(R.id.mainToolbar).setOnClickListener(v ->
@@ -72,7 +72,7 @@ public class MisVehiculosFragment extends Fragment implements VehicleAdapter.OnV
         if (userId != null) {
             viewModel.loadVehicles(userId);
         } else {
-            Toast.makeText(getContext(), "No hay usuario autenticado", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.no_usuario_autenticado), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -108,17 +108,17 @@ public class MisVehiculosFragment extends Fragment implements VehicleAdapter.OnV
             viewModel.deleteVehicle(userId, vehicle.getId(), new com.lksnext.parkingplantilla.domain.Callback() {
                 @Override
                 public void onSuccess() {
-                    Toast.makeText(getContext(), "Vehículo eliminado", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.vehiculo_eliminado), Toast.LENGTH_SHORT).show();
                     cargarVehiculos();
                 }
 
                 @Override
                 public void onFailure() {
-                    Toast.makeText(getContext(), "Error al eliminar el vehículo", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.error_eliminar_vehiculo), Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
-            Toast.makeText(getContext(), "No hay usuario autenticado", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.no_usuario_autenticado), Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -64,7 +64,7 @@ public class AnadirEditarVehiculoFragment extends Fragment {
         // Use the shared Toolbar from MainActivity
         AppCompatActivity activity = (AppCompatActivity) requireActivity();
         if (activity.getSupportActionBar() != null) {
-            activity.getSupportActionBar().setTitle(vehicleToEdit == null ? "Añadir Vehículo" : "Editar Vehículo");
+            activity.getSupportActionBar().setTitle(vehicleToEdit == null ? getString(R.string.anadir_editar_vehiculo) : getString(R.string.editar_vehiculo));
             activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         requireActivity().findViewById(R.id.mainToolbar).setOnClickListener(v -> requireActivity().onBackPressed());
@@ -72,8 +72,8 @@ public class AnadirEditarVehiculoFragment extends Fragment {
 
         // Spinner de tipo de vehículo
         ArrayAdapter<String> tipoAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, new String[]{
-                Vehicle.VehicleType.CAR.getDisplayName(),
-                Vehicle.VehicleType.MOTORCYCLE.getDisplayName()
+                getString(R.string.tipo_coche),
+                getString(R.string.tipo_moto)
         });
         tipoAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spinnerTipo.setAdapter(tipoAdapter);
@@ -227,13 +227,13 @@ public class AnadirEditarVehiculoFragment extends Fragment {
                 }
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
-                handler.post(() -> Toast.makeText(getContext(), "Error cargando marcas: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                handler.post(() -> Toast.makeText(getContext(), getString(R.string.error_cargando_marcas, e.getMessage()), Toast.LENGTH_LONG).show());
             }
             handler.post(() -> {
                 marcas.clear();
                 marcas.addAll(result);
                 marcaAdapter.notifyDataSetChanged();
-                Toast.makeText(getContext(), "Marcas recibidas: " + result.size(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getString(R.string.marcas_recibidas, result.size()), Toast.LENGTH_LONG).show();
                 // Si editando, seleccionar marca
                 if (vehicleToEdit != null && vehicleToEdit.getBrand() != null) {
                     int pos = marcas.indexOf(vehicleToEdit.getBrand());
@@ -320,13 +320,13 @@ public class AnadirEditarVehiculoFragment extends Fragment {
                 }
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
-                handler.post(() -> Toast.makeText(getContext(), "Error cargando modelos: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                handler.post(() -> Toast.makeText(getContext(), getString(R.string.error_cargando_modelos, e.getMessage()), Toast.LENGTH_LONG).show());
             }
             handler.post(() -> {
                 modelos.clear();
                 modelos.addAll(result);
                 modeloAdapter.notifyDataSetChanged();
-                Toast.makeText(getContext(), "Modelos recibidos: " + result.size(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getString(R.string.modelos_recibidos, result.size()), Toast.LENGTH_LONG).show();
                 // Si editando, seleccionar modelo
                 if (vehicleToEdit != null && vehicleToEdit.getModel() != null) {
                     int pos = modelos.indexOf(vehicleToEdit.getModel());
@@ -367,20 +367,20 @@ public class AnadirEditarVehiculoFragment extends Fragment {
                 }
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
-                handler.post(() -> Toast.makeText(getContext(), "Error cargando eléctricos: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                handler.post(() -> Toast.makeText(getContext(), getString(R.string.error_cargando_electricos, e.getMessage()), Toast.LENGTH_LONG).show());
             }
             handler.post(() -> {
                 if (trimsElectricos.isEmpty()) {
-                    Toast.makeText(getContext(), "No hay versiones eléctricas para este modelo", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), getString(R.string.no_versiones_electricas), Toast.LENGTH_LONG).show();
                 } else {
                     // Mostrar trims eléctricos en un diálogo o spinner, según tu UI
                     // Por ejemplo, puedes mostrar un diálogo para que el usuario elija el trim
                     new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                        .setTitle("Selecciona versión eléctrica")
+                        .setTitle(getString(R.string.selecciona_version_electrica))
                         .setItems(trimsElectricos.toArray(new String[0]), (dialog, which) -> {
                             // Puedes guardar la selección si lo necesitas
                         })
-                        .setNegativeButton("Cancelar", null)
+                        .setNegativeButton(getString(R.string.cancelar), null)
                         .show();
                 }
             });
@@ -419,7 +419,7 @@ public class AnadirEditarVehiculoFragment extends Fragment {
                 motoModelsArray = modelsObj.getJSONArray("data");
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
-                handler.post(() -> Toast.makeText(getContext(), "Error cargando motos: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                handler.post(() -> Toast.makeText(getContext(), getString(R.string.error_cargando_motos, e.getMessage()), Toast.LENGTH_LONG).show());
             }
             handler.post(() -> {
                 marcas.clear();
@@ -461,12 +461,12 @@ public class AnadirEditarVehiculoFragment extends Fragment {
 
         // Validar formato de matrícula española: 4 números y 3 letras mayúsculas sin vocales
         if (!matricula.matches("^[0-9]{4}[B-DF-HJ-NP-TV-Z]{3}$")) {
-            Toast.makeText(getContext(), "Matrícula no válida. Debe tener 4 números y 3 consonantes mayúsculas (ej: 1234BCD)", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.matricula_no_valida), Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (TextUtils.isEmpty(nombre) || TextUtils.isEmpty(matricula) || TextUtils.isEmpty(marca) || TextUtils.isEmpty(modelo)) {
-            Toast.makeText(getContext(), "Completa todos los campos", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.completa_todos_los_campos), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -477,12 +477,12 @@ public class AnadirEditarVehiculoFragment extends Fragment {
         viewModel.addOrUpdateVehicle(vehiculo, vehicleToEdit != null, new Callback() {
             @Override
             public void onSuccess() {
-                Toast.makeText(getContext(), "Vehículo guardado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.vehiculo_guardado), Toast.LENGTH_SHORT).show();
                 requireActivity().onBackPressed();
             }
             @Override
             public void onFailure() {
-                Toast.makeText(getContext(), "Error al guardar vehículo", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.error_guardar_vehiculo), Toast.LENGTH_SHORT).show();
             }
         });
     }

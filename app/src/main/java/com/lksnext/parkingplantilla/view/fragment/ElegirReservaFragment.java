@@ -39,7 +39,7 @@ public class ElegirReservaFragment extends Fragment {
         // Use the shared Toolbar from MainActivity
         AppCompatActivity activity = (AppCompatActivity) requireActivity();
         if (activity.getSupportActionBar() != null) {
-            activity.getSupportActionBar().setTitle("Elegir tipo de reserva");
+            activity.getSupportActionBar().setTitle(getString(R.string.elegir_tipo_reserva));
             activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         requireActivity().findViewById(R.id.mainToolbar).setOnClickListener(v -> requireActivity().onBackPressed());
@@ -73,7 +73,7 @@ public class ElegirReservaFragment extends Fragment {
         // Adaptación: ahora los "cuadrados" son opcionReservar y opcionAparcarYa
         binding.opcionReservar.setOnClickListener(v -> {
             if (selectedVehicle == null) {
-                Toast.makeText(getContext(), "Selecciona un vehículo", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.selecciona_un_vehiculo), Toast.LENGTH_SHORT).show();
                 return;
             }
             Bundle args = new Bundle();
@@ -83,7 +83,7 @@ public class ElegirReservaFragment extends Fragment {
         });
         binding.opcionAparcarYa.setOnClickListener(v -> {
             if (selectedVehicle == null) {
-                Toast.makeText(getContext(), "Selecciona un vehículo", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.selecciona_un_vehiculo), Toast.LENGTH_SHORT).show();
                 return;
             }
             Bundle args = new Bundle();

@@ -21,7 +21,7 @@
                 android:id="@+id/tvTitulo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Anadir/Editar Vehículo"
+                android:text="@string/anadir_editar_vehiculo"
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:textColor="#1976D2"
@@ -32,7 +32,7 @@
                 android:id="@+id/etNombre"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Nombre o apodo"
+                android:hint="@string/nombre_apodo"
                 android:inputType="textPersonName"
                 android:layout_marginBottom="12dp" />
 
@@ -40,7 +40,7 @@
                 android:id="@+id/etMatricula"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Matrícula"
+                android:hint="@string/matricula"
                 android:inputType="text"
                 android:layout_marginBottom="12dp" />
 
@@ -48,14 +48,14 @@
                 android:id="@+id/spinnerMarca"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Marca"
+                android:prompt="@string/marca"
                 android:layout_marginBottom="12dp" />
 
             <Spinner
                 android:id="@+id/spinnerModelo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Modelo"
+                android:prompt="@string/modelo"
                 android:layout_marginBottom="12dp" />
 
             <LinearLayout
@@ -68,7 +68,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="¿Vehículo eléctrico?"
+                    android:text="@string/vehiculo_electrico"
                     android:textSize="16sp"
                     android:layout_marginEnd="12dp" />
                 <Switch
@@ -87,7 +87,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="¿Para minusválidos?"
+                    android:text="@string/para_minusvalidos"
                     android:textSize="16sp"
                     android:layout_marginEnd="12dp" />
                 <Switch
@@ -106,7 +106,7 @@
                 android:id="@+id/btnGuardar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Guardar"
+                android:text="@string/guardar"
                 android:backgroundTint="#1976D2"
                 android:textColor="@android:color/white" />
         </LinearLayout>

@@ -29,7 +29,7 @@ public class MainMenuFragment extends Fragment {
         // Use the shared Toolbar from MainActivity
         AppCompatActivity activity = (AppCompatActivity) requireActivity();
         if (activity.getSupportActionBar() != null) {
-            activity.getSupportActionBar().setTitle("Inicio");
+            activity.getSupportActionBar().setTitle(getString(R.string.inicio));
             activity.getSupportActionBar().setDisplayHomeAsUpEnabled(false); // Oculta la flecha de atrás
         }
         requireActivity().findViewById(R.id.mainToolbar).setOnClickListener(v -> requireActivity().onBackPressed());

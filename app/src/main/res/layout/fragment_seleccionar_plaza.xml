@@ -16,7 +16,7 @@
             android:id="@+id/tvTituloSeleccionPlaza"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Selecciona tu plaza de aparcamiento"
+            android:text="@string/selecciona_tu_plaza"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#1976D2"
@@ -27,7 +27,7 @@
             android:id="@+id/tvFechaHora"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Datos de la reserva"
+            android:text="@string/datos_reserva"
             android:textSize="16sp"
             android:gravity="center"
             android:layout_marginBottom="24dp" />
@@ -51,7 +51,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Plazas coche"
+                android:text="@string/plazas_coche"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:padding="8dp" />
@@ -71,7 +71,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Plazas coche eléctrico"
+                android:text="@string/plazas_coche_electrico"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:padding="8dp" />
@@ -91,7 +91,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Plazas coche minusválido"
+                android:text="@string/plazas_coche_minusvalido"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:padding="8dp" />
@@ -111,7 +111,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Plazas coche minusválido eléctrico"
+                android:text="@string/plazas_coche_minusvalido_electrico"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:padding="8dp" />
@@ -131,7 +131,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Plazas moto"
+                android:text="@string/plazas_moto"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:padding="8dp" />
@@ -151,7 +151,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Plazas moto minusválida"
+                android:text="@string/plazas_moto_minusvalida"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:padding="8dp" />
@@ -166,7 +166,7 @@
             android:id="@+id/btnConfirmarReserva"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Confirmar Reserva"
+            android:text="@string/confirmar_reserva"
             android:backgroundTint="#1976D2"
             android:textColor="@android:color/white"
             android:padding="12dp"

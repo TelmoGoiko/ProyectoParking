@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:gravity="center"
-            android:text="¿Eliminar vehículo?"
+            android:text="@string/eliminar_vehiculo_titulo"
             android:textColor="@android:color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:gravity="center"
-            android:text="¿Estás seguro de que quieres eliminar este vehículo?"
+            android:text="@string/eliminar_vehiculo_mensaje"
             android:textColor="@android:color/darker_gray"
             android:textSize="16sp" />
 
@@ -45,7 +45,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
                 android:backgroundTint="@android:color/darker_gray"
-                android:text="Cancelar" />
+                android:text="@string/cancelar" />
 
             <Button
                 android:id="@+id/btnConfirmDelete"
@@ -54,7 +54,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
                 android:backgroundTint="@android:color/holo_red_light"
-                android:text="Eliminar" />
+                android:text="@string/eliminar" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
