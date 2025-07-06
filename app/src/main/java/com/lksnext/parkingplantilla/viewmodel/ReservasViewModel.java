@@ -8,17 +8,21 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.lksnext.parkingplantilla.data.DataRepository;
+import com.lksnext.parkingplantilla.data.IVehicleRepository;
 import com.lksnext.parkingplantilla.domain.Callback;
 import com.lksnext.parkingplantilla.domain.Hora;
 import com.lksnext.parkingplantilla.domain.Plaza;
 import com.lksnext.parkingplantilla.domain.Reserva;
+import com.lksnext.parkingplantilla.model.Vehicle;
+import com.lksnext.parkingplantilla.util.IReservaNotificationScheduler;
 import com.lksnext.parkingplantilla.util.NotificacionReservaScheduler;
 
 import java.util.List;
 
 public class ReservasViewModel extends androidx.lifecycle.AndroidViewModel {
 
-    private final DataRepository repository;
+    private final IVehicleRepository repository;
+    private final IReservaNotificationScheduler notificationScheduler;
     private final MutableLiveData<List<Plaza>> availablePlazas = new MutableLiveData<>();
     private final MutableLiveData<List<Reserva>> userReservas = new MutableLiveData<>();
     private final MutableLiveData<Reserva> selectedReserva = new MutableLiveData<>();
@@ -29,7 +33,20 @@ public class ReservasViewModel extends androidx.lifecycle.AndroidViewModel {
 
     public ReservasViewModel(@NonNull Application application) {
         super(application);
-        repository = DataRepository.getInstance();
+        repository = com.lksnext.parkingplantilla.data.DataRepository.getInstance();
+        notificationScheduler = new NotificacionReservaScheduler(application.getApplicationContext());
+    }
+    // Constructor para test
+    protected ReservasViewModel(@NonNull Application application, IVehicleRepository repository) {
+        super(application);
+        this.repository = repository;
+        this.notificationScheduler = null;
+    }
+    // Constructor para test con mock de notificaciones
+    public ReservasViewModel(@NonNull Application application, IVehicleRepository repository, IReservaNotificationScheduler notificationScheduler) {
+        super(application);
+        this.repository = repository;
+        this.notificationScheduler = notificationScheduler;
     }
 
     public LiveData<List<Plaza>> getAvailablePlazas() {
@@ -81,15 +98,17 @@ public class ReservasViewModel extends androidx.lifecycle.AndroidViewModel {
             repository.createReserva(userId, reserva, new Callback() {
                 @Override
                 public void onSuccess() {
+                    errorMessage.setValue(null); // Limpiar error tras éxito
                     reservaCreated.setValue(true);
                     loadUserReservas(); // Actualizar la lista de reservas
-                    // Programar notificaciones locales
-                    NotificacionReservaScheduler.programarNotificaciones(
-                        getApplication().getApplicationContext(),
-                        fecha,
-                        hora.getHoraInicio(),
-                        String.valueOf(plaza.getId())
-                    );
+                    // Programar notificaciones locales solo si hay scheduler
+                    if (notificationScheduler != null) {
+                        notificationScheduler.programarNotificaciones(
+                            fecha,
+                            hora.getHoraInicio(),
+                            String.valueOf(plaza.getId())
+                        );
+                    }
                 }
 
                 @Override
@@ -122,15 +141,16 @@ public class ReservasViewModel extends androidx.lifecycle.AndroidViewModel {
     public void updateReserva(Reserva reserva) {
         String userId = repository.getCurrentUserId();
         if (userId != null) {
-            // Solo permitir edición si la reserva está en estado 'pendiente'
-            if (reserva.getEstado() != null && !"pendiente".equalsIgnoreCase(reserva.getEstado())) {
-                errorMessage.setValue("Solo se puede editar una reserva pendiente (antes de su inicio).");
+            // Solo permitir edición si la reserva está en estado 'Confirmada'
+            if (reserva.getEstado() != null && !"Confirmada".equalsIgnoreCase(reserva.getEstado())) {
+                errorMessage.setValue("Solo se puede editar una reserva confirmada.");
                 reservaUpdated.setValue(false);
                 return;
             }
             repository.updateReserva(userId, reserva, new Callback() {
                 @Override
                 public void onSuccess() {
+                    errorMessage.setValue(null); // Limpiar error tras éxito
                     reservaUpdated.setValue(true);
                     loadUserReservas(); // Actualizar la lista de reservas
                 }
@@ -160,6 +180,7 @@ public class ReservasViewModel extends androidx.lifecycle.AndroidViewModel {
             repository.deleteReserva(userId, reservaId, new Callback() {
                 @Override
                 public void onSuccess() {
+                    errorMessage.setValue(null); // Limpiar error tras éxito
                     reservaDeleted.setValue(true);
                     loadUserReservas(); // Actualizar la lista de reservas
                 }
@@ -179,5 +200,9 @@ public class ReservasViewModel extends androidx.lifecycle.AndroidViewModel {
     // Verificar si hay un usuario autenticado
     public boolean isUserAuthenticated() {
         return repository.isUserAuthenticated();
+    }
+
+    public String getCurrentUserId() {
+        return repository.getCurrentUserId();
     }
 }

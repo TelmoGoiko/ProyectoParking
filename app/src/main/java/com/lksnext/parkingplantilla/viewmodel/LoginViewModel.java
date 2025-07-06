@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.lksnext.parkingplantilla.data.DataRepository;
+import com.lksnext.parkingplantilla.data.IVehicleRepository;
 import com.lksnext.parkingplantilla.domain.Callback;
 
 public class LoginViewModel extends ViewModel {
@@ -12,10 +12,14 @@ public class LoginViewModel extends ViewModel {
     // Aquí puedes declarar los LiveData y métodos necesarios para la vista de inicio de sesión
     MutableLiveData<Boolean> logged = new MutableLiveData<>(null);
     private MutableLiveData<String> userEmail = new MutableLiveData<>();
-    private final DataRepository dataRepository;
+    private final IVehicleRepository dataRepository;
 
     public LoginViewModel() {
-        dataRepository = DataRepository.getInstance();
+        this(com.lksnext.parkingplantilla.data.DataRepository.getInstance());
+    }
+    // Constructor para test
+    protected LoginViewModel(IVehicleRepository dataRepository) {
+        this.dataRepository = dataRepository;
     }
 
     public LiveData<Boolean> isLogged(){
@@ -36,7 +40,7 @@ public class LoginViewModel extends ViewModel {
                 }
             });
         } else {
-            // Es un nombre de usuario, buscar el email en Firestore
+            // Es un nombre de usuario, buscar el email en el repositorio
             dataRepository.findUserByUsername(userOrEmail, new Callback() {
                 @Override
                 public void onSuccess() {

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import androidx.lifecycle.MutableLiveData;
 
-public class DataRepository {
+public class DataRepository implements IVehicleRepository {
 
     private static DataRepository instance;
     private final FirebaseAuth firebaseAuth;
@@ -63,6 +63,7 @@ public class DataRepository {
     }
 
     // Petición del login.
+    @Override
     public void login(String email, String pass, Callback callback){
         firebaseAuth.signInWithEmailAndPassword(email, pass)
             .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -197,7 +198,7 @@ public class DataRepository {
             });
     }
 
-    // Find user by username
+    @Override
     public void findUserByUsername(String username, Callback callback, MutableLiveData<String> emailResult) {
         firestore.collection(users)
             .whereEqualTo(FIELD_USERNAME, username)
@@ -339,11 +340,18 @@ public class DataRepository {
                                             long end2 = reserva.getHoraInicio().getHoraFin();
                                             if (start1 < end2 && start2 < end1) {
                                                 solapadaVehiculo = true;
+                                                android.util.Log.d("RESERVA_DEBUG", "Solapamiento detectado con reserva existente: " + r.getId() +
+                                                    " - Vehículo: " + r.getVehicleId() +
+                                                    " - Fecha: " + r.getFecha() +
+                                                    " - Hora: " + start1 + "-" + end1);
                                                 break;
                                             }
                                         }
                                     }
                                     if (solapadaVehiculo) {
+                                        android.util.Log.d("RESERVA_DEBUG", "Intento de reserva con vehículo que ya tiene reserva: " +
+                                            reserva.getVehicleId() + " - Fecha: " + reserva.getFecha() +
+                                            " - Hora: " + reserva.getHoraInicio().getHoraInicio() + "-" + reserva.getHoraInicio().getHoraFin());
                                         callback.onFailure("Este vehículo ya tiene una reserva en ese rango horario. No puedes reservar dos plazas a la vez con el mismo vehículo.");
                                     } else {
                                         // Si pasa todas las validaciones, guardar la reserva
@@ -354,6 +362,10 @@ public class DataRepository {
                                         if (reserva.getEstado() == null || reserva.getEstado().isEmpty()) {
                                             reserva.setEstado(ESTADO_CONFIRMADA);
                                         }
+                                        android.util.Log.d("RESERVA_DEBUG", "Guardando nueva reserva - Vehículo: " +
+                                            reserva.getVehicleId() + " - Fecha: " + reserva.getFecha() +
+                                            " - Hora: " + reserva.getHoraInicio().getHoraInicio() + "-" + reserva.getHoraInicio().getHoraFin());
+
                                         firestore.collection(users).document(userId)
                                             .collection(reservas).document(reserva.getId())
                                             .set(reserva)
@@ -547,11 +559,18 @@ public class DataRepository {
                                             long end2 = reserva.getHoraInicio().getHoraFin();
                                             if (start1 < end2 && start2 < end1) {
                                                 solapadaVehiculo = true;
+                                                android.util.Log.d("RESERVA_DEBUG", "Solapamiento detectado con reserva existente: " + r.getId() +
+                                                    " - Vehículo: " + r.getVehicleId() +
+                                                    " - Fecha: " + r.getFecha() +
+                                                    " - Hora: " + start1 + "-" + end1);
                                                 break;
                                             }
                                         }
                                     }
                                     if (solapadaVehiculo) {
+                                        android.util.Log.d("RESERVA_DEBUG", "Intento de reserva con vehículo que ya tiene reserva: " +
+                                            reserva.getVehicleId() + " - Fecha: " + reserva.getFecha() +
+                                            " - Hora: " + reserva.getHoraInicio().getHoraInicio() + "-" + reserva.getHoraInicio().getHoraFin());
                                         callback.onFailure("Este vehículo ya tiene una reserva en ese rango horario. No puedes reservar dos plazas a la vez con el mismo vehículo.");
                                     } else {
                                         firestore.collection(users).document(userId)

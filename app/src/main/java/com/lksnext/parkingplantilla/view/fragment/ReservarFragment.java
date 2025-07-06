@@ -332,18 +332,28 @@ public class ReservarFragment extends Fragment {
                     boolean solapada = false;
                     if (reservas != null) {
                         for (com.lksnext.parkingplantilla.domain.Reserva r : reservas) {
-                            if (r.getFecha() != null && r.getFecha().equals(fechaFormatted) && r.getHoraInicio() != null) {
+                            // Solo comprobar solapamiento si es el mismo vehículo
+                            if (r.getVehicleId() != null && r.getVehicleId().equals(selectedVehicle.getId()) &&
+                                r.getFecha() != null && r.getFecha().equals(fechaFormatted) &&
+                                r.getHoraInicio() != null) {
+
                                 long start1 = r.getHoraInicio().getHoraInicio();
                                 long end1 = r.getHoraInicio().getHoraFin();
+
+                                // Verificar solapamiento de horarios
                                 if (horaInicio < end1 && start1 < horaFin) {
                                     solapada = true;
+                                    android.util.Log.d("RESERVA_DEBUG", "Solapamiento detectado con reserva existente: " + r.getId() +
+                                        " - Mismo vehículo: " + r.getVehicleId() +
+                                        " - Fecha: " + r.getFecha() +
+                                        " - Hora: " + start1 + "-" + end1);
                                     break;
                                 }
                             }
                         }
                     }
                     if (solapada) {
-                        Toast.makeText(getContext(), getString(R.string.reserva_solapada), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Este vehículo ya tiene una reserva en ese rango horario. No puedes reservar dos plazas a la vez con el mismo vehículo.", Toast.LENGTH_LONG).show();
                     } else {
                         Bundle bundle = new Bundle();
                         bundle.putSerializable(ARG_SELECTED_VEHICLE, selectedVehicle);

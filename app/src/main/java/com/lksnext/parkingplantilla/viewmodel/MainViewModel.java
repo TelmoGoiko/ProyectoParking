@@ -5,14 +5,27 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.lksnext.parkingplantilla.data.DataRepository;
+import com.lksnext.parkingplantilla.data.IVehicleRepository;
 import com.lksnext.parkingplantilla.domain.Callback;
 import com.lksnext.parkingplantilla.model.Vehicle;
 
 import java.util.List;
 
 public class MainViewModel extends ViewModel {
-    private final DataRepository repository = DataRepository.getInstance();
-    private final MutableLiveData<List<Vehicle>> vehiclesLiveData = new MutableLiveData<>();
+    final IVehicleRepository repository;
+    final MutableLiveData<List<Vehicle>> vehiclesLiveData;
+
+    // Constructor por defecto
+    public MainViewModel() {
+        this.repository = DataRepository.getInstance();
+        this.vehiclesLiveData = new MutableLiveData<>();
+    }
+
+    // Constructor para test (permite inyectar mocks)
+    protected MainViewModel(IVehicleRepository repository, MutableLiveData<List<Vehicle>> vehiclesLiveData) {
+        this.repository = repository;
+        this.vehiclesLiveData = vehiclesLiveData;
+    }
 
     public LiveData<List<Vehicle>> getVehiclesLiveData() {
         return vehiclesLiveData;

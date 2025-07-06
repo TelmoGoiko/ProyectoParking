@@ -73,6 +73,17 @@ public class ReservasAdapter extends RecyclerView.Adapter<ReservasAdapter.Reserv
             binding.tvHorario.setText(String.format("%s - %s", reserva.getHoraInicio(), reserva.getHoraFin()));
             binding.tvEstado.setText(reserva.getEstado());
 
+            // Mostrar info del vehículo directamente desde la reserva
+            String info = "";
+            if (reserva.getNombreVehiculo() != null && !reserva.getNombreVehiculo().isEmpty()) {
+                info += reserva.getNombreVehiculo();
+            }
+            if (reserva.getMatriculaVehiculo() != null && !reserva.getMatriculaVehiculo().isEmpty()) {
+                if (!info.isEmpty()) info += " ";
+                info += "(" + reserva.getMatriculaVehiculo() + ")";
+            }
+            binding.tvVehiculoInfo.setText(info.isEmpty() ? "-" : info);
+
             // Mostrar el botón de editar solo si la reserva está en estado 'Confirmada'
             if (reserva.getEstado() != null && reserva.getEstado().equalsIgnoreCase("Confirmada")) {
                 binding.btnEditar.setVisibility(android.view.View.VISIBLE);
