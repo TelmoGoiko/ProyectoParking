@@ -22,6 +22,7 @@ import com.lksnext.parkingplantilla.viewmodel.ReservasViewModel;
 import java.util.Calendar;
 
 public class ReservarFragment extends Fragment {
+    private static final String ARG_SELECTED_VEHICLE = "selectedVehicle";
     private FragmentReservarBinding binding;
     private Vehicle selectedVehicle;
     private ReservasViewModel reservasViewModel;
@@ -66,8 +67,8 @@ public class ReservarFragment extends Fragment {
         }
 
         // Obtener vehículo seleccionado de argumentos
-        if (getArguments() != null && getArguments().containsKey("selectedVehicle")) {
-            selectedVehicle = (Vehicle) getArguments().getSerializable("selectedVehicle");
+        if (getArguments() != null && getArguments().containsKey(ARG_SELECTED_VEHICLE)) {
+            selectedVehicle = (Vehicle) getArguments().getSerializable(ARG_SELECTED_VEHICLE);
         }
 
         // Configurar fecha y hora actuales
@@ -345,7 +346,7 @@ public class ReservarFragment extends Fragment {
                         Toast.makeText(getContext(), getString(R.string.reserva_solapada), Toast.LENGTH_LONG).show();
                     } else {
                         Bundle bundle = new Bundle();
-                        bundle.putSerializable("selectedVehicle", selectedVehicle);
+                        bundle.putSerializable(ARG_SELECTED_VEHICLE, selectedVehicle);
                         bundle.putString("fecha", fechaFormatted);
                         bundle.putLong("horaInicio", horaInicio);
                         bundle.putLong("horaFin", horaFin);

@@ -33,6 +33,21 @@ public class DataRepository {
     // Reservas
     private final String reservas = "reservas";
 
+    private static final String ESTADO_CONFIRMADA = "Confirmada";
+    private static final String ESTADO_EN_CURSO = "En curso";
+    private static final String ESTADO_FINALIZADA = "Finalizada";
+
+    private static final String FIELD_VEHICLE_ID = "vehicleId";
+    private static final String FIELD_FECHA = "fecha";
+    private static final String FIELD_PLAZA_ID = "plazaId.id";
+
+    private static final String DATE_FORMAT_DDMMYYYY = "dd/MM/yyyy";
+
+    private static final String ERROR_EXISTENCIA_VEHICULO = "Error al comprobar existencia de vehículo";
+    private static final String ERROR_SOLAPAMIENTO_RESERVAS_VEHICULO = "Error al comprobar solapamiento de reservas de vehículo";
+    private static final String ERROR_SOLAPAMIENTO_RESERVAS = "Error al comprobar solapamiento de reservas";
+    private static final String FIELD_USERNAME = "username";
+    private static final String FIELD_EMAIL = "email";
 
     private DataRepository(){
         firebaseAuth = FirebaseAuth.getInstance();
@@ -89,8 +104,8 @@ public class DataRepository {
                         user.getDisplayName() : user.getEmail().split("@")[0];
 
                     Map<String, Object> userData = new HashMap<>();
-                    userData.put("username", username);
-                    userData.put("email", user.getEmail());
+                    userData.put(FIELD_USERNAME, username);
+                    userData.put(FIELD_EMAIL, user.getEmail());
                     userData.put("uid", user.getUid());
 
                     firestore.collection(users).document(user.getUid()).set(userData);
@@ -148,11 +163,11 @@ public class DataRepository {
             .delete()
             .addOnSuccessListener(aVoid -> {
                 // Eliminar reservas futuras asociadas a este vehículo
-                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(DATE_FORMAT_DDMMYYYY);
                 String today = sdf.format(new java.util.Date());
                 firestore.collection(users).document(userId)
                     .collection(reservas)
-                    .whereEqualTo("vehicleId", vehicleId)
+                    .whereEqualTo(FIELD_VEHICLE_ID, vehicleId)
                     .get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
@@ -185,11 +200,11 @@ public class DataRepository {
     // Find user by username
     public void findUserByUsername(String username, Callback callback, MutableLiveData<String> emailResult) {
         firestore.collection(users)
-            .whereEqualTo("username", username)
+            .whereEqualTo(FIELD_USERNAME, username)
             .get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 if (!queryDocumentSnapshots.isEmpty() && !queryDocumentSnapshots.getDocuments().isEmpty()) {
-                    String email = queryDocumentSnapshots.getDocuments().get(0).getString("email");
+                    String email = queryDocumentSnapshots.getDocuments().get(0).getString(FIELD_EMAIL);
                     if (email != null) {
                         emailResult.setValue(email);
                         callback.onSuccess();
@@ -206,7 +221,7 @@ public class DataRepository {
     // Check if username exists
     public void checkUsernameExists(String username, Callback callback) {
         firestore.collection(users)
-            .whereEqualTo("username", username)
+            .whereEqualTo(FIELD_USERNAME, username)
             .get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 if (!queryDocumentSnapshots.isEmpty()) {
@@ -225,8 +240,8 @@ public class DataRepository {
                 if (task.isSuccessful()) {
                     String uid = firebaseAuth.getCurrentUser().getUid();
                     Map<String, Object> userMap = new HashMap<>();
-                    userMap.put("username", username);
-                    userMap.put("email", email);
+                    userMap.put(FIELD_USERNAME, username);
+                    userMap.put(FIELD_EMAIL, email);
                     userMap.put("uid", uid);
                     firestore.collection(users).document(uid).set(userMap)
                         .addOnSuccessListener(aVoid -> callback.onSuccess())
@@ -249,7 +264,7 @@ public class DataRepository {
         }
 
         // Validación: fecha entre hoy y 7 días naturales
-        final java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+        final java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(DATE_FORMAT_DDMMYYYY);
         java.util.Calendar hoy = java.util.Calendar.getInstance();
         java.util.Calendar fechaReserva = java.util.Calendar.getInstance();
         try {
@@ -284,8 +299,8 @@ public class DataRepository {
                 }
                 // Validación: no solapamiento de reservas para la misma plaza
                 firestore.collectionGroup(reservas)
-                    .whereEqualTo("fecha", reserva.getFecha())
-                    .whereEqualTo("plazaId.id", reserva.getPlazaId().getId())
+                    .whereEqualTo(FIELD_FECHA, reserva.getFecha())
+                    .whereEqualTo(FIELD_PLAZA_ID, reserva.getPlazaId().getId())
                     .get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         boolean solapada = false;
@@ -309,8 +324,8 @@ public class DataRepository {
                         } else {
                             // Validación: no solapamiento de reservas para el mismo vehículo en cualquier plaza en el mismo rango horario
                             firestore.collectionGroup(reservas)
-                                .whereEqualTo("fecha", reserva.getFecha())
-                                .whereEqualTo("vehicleId", reserva.getVehicleId())
+                                .whereEqualTo(FIELD_FECHA, reserva.getFecha())
+                                .whereEqualTo(FIELD_VEHICLE_ID, reserva.getVehicleId())
                                 .get()
                                 .addOnSuccessListener(vehicleDocs -> {
                                     boolean solapadaVehiculo = false;
@@ -337,7 +352,7 @@ public class DataRepository {
                                         }
                                         // Si no se especifica estado, poner 'Confirmada' por defecto
                                         if (reserva.getEstado() == null || reserva.getEstado().isEmpty()) {
-                                            reserva.setEstado("Confirmada");
+                                            reserva.setEstado(ESTADO_CONFIRMADA);
                                         }
                                         firestore.collection(users).document(userId)
                                             .collection(reservas).document(reserva.getId())
@@ -350,19 +365,19 @@ public class DataRepository {
                                     }
                                 })
                                 .addOnFailureListener(e -> {
-                                    android.util.Log.e(FIRESTORE_ERROR, "Error al comprobar solapamiento de reservas de vehículo", e);
-                                    callback.onFailure("Error al comprobar solapamiento de reservas de vehículo");
+                                    android.util.Log.e(FIRESTORE_ERROR, ERROR_SOLAPAMIENTO_RESERVAS_VEHICULO, e);
+                                    callback.onFailure(ERROR_SOLAPAMIENTO_RESERVAS_VEHICULO);
                                 });
                         }
                     })
                     .addOnFailureListener(e -> {
-                        android.util.Log.e(FIRESTORE_ERROR, "Error al comprobar solapamiento de reservas", e);
-                        callback.onFailure("Error al comprobar solapamiento de reservas");
+                        android.util.Log.e(FIRESTORE_ERROR, ERROR_SOLAPAMIENTO_RESERVAS, e);
+                        callback.onFailure(ERROR_SOLAPAMIENTO_RESERVAS);
                     });
             })
             .addOnFailureListener(e -> {
-                android.util.Log.e(FIRESTORE_ERROR, "Error al comprobar existencia de vehículo", e);
-                callback.onFailure("Error al comprobar existencia de vehículo");
+                android.util.Log.e(FIRESTORE_ERROR, ERROR_EXISTENCIA_VEHICULO, e);
+                callback.onFailure(ERROR_EXISTENCIA_VEHICULO);
             });
     }
 
@@ -382,19 +397,19 @@ public class DataRepository {
                         String nuevoEstado = null;
                         if (reserva.getHoraInicio() != null && reserva.getEstado() != null) {
                             try {
-                                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+                                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(DATE_FORMAT_DDMMYYYY);
                                 java.util.Date fechaBase = sdf.parse(reserva.getFecha());
                                 long inicio = fechaBase.getTime() + reserva.getHoraInicio().getHoraInicio() * 1000L;
                                 long fin = fechaBase.getTime() + reserva.getHoraInicio().getHoraFin() * 1000L;
                                 long ahora = now.getTime();
-                                if (ahora < inicio && !"Confirmada".equals(reserva.getEstado())) {
-                                    nuevoEstado = "Confirmada";
+                                if (ahora < inicio && !ESTADO_CONFIRMADA.equals(reserva.getEstado())) {
+                                    nuevoEstado = ESTADO_CONFIRMADA;
                                     needsUpdate = true;
-                                } else if (ahora >= inicio && ahora < fin && !"En curso".equals(reserva.getEstado())) {
-                                    nuevoEstado = "En curso";
+                                } else if (ahora >= inicio && ahora < fin && !ESTADO_EN_CURSO.equals(reserva.getEstado())) {
+                                    nuevoEstado = ESTADO_EN_CURSO;
                                     needsUpdate = true;
-                                } else if (ahora >= fin && !"Finalizada".equals(reserva.getEstado())) {
-                                    nuevoEstado = "Finalizada";
+                                } else if (ahora >= fin && !ESTADO_FINALIZADA.equals(reserva.getEstado())) {
+                                    nuevoEstado = ESTADO_FINALIZADA;
                                     needsUpdate = true;
                                     anyFinalizada = true;
                                 }
@@ -446,7 +461,7 @@ public class DataRepository {
     // Actualizar una reserva existente
     public void updateReserva(String userId, com.lksnext.parkingplantilla.domain.Reserva reserva, Callback callback) {
         // Solo permitir edición si la reserva está en estado 'Confirmada'
-        if (reserva.getEstado() != null && !"Confirmada".equalsIgnoreCase(reserva.getEstado())) {
+        if (reserva.getEstado() != null && !ESTADO_CONFIRMADA.equalsIgnoreCase(reserva.getEstado())) {
             callback.onFailure("Solo se puede editar una reserva Confirmada (antes de su inicio).");
             return;
         }
@@ -459,7 +474,7 @@ public class DataRepository {
             }
         }
         // Validación: fecha entre hoy y 7 días naturales
-        final java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+        final java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(DATE_FORMAT_DDMMYYYY);
         java.util.Calendar hoy = java.util.Calendar.getInstance();
         java.util.Calendar fechaReserva = java.util.Calendar.getInstance();
         try {
@@ -493,8 +508,8 @@ public class DataRepository {
                 }
                 // Validación: no solapamiento de reservas para la misma plaza
                 firestore.collectionGroup(reservas)
-                    .whereEqualTo("fecha", reserva.getFecha())
-                    .whereEqualTo("plazaId.id", reserva.getPlazaId().getId())
+                    .whereEqualTo(FIELD_FECHA, reserva.getFecha())
+                    .whereEqualTo(FIELD_PLAZA_ID, reserva.getPlazaId().getId())
                     .get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         boolean solapada = false;
@@ -517,8 +532,8 @@ public class DataRepository {
                         } else {
                             // Validación: no solapamiento de reservas para el mismo vehículo en cualquier plaza en el mismo rango horario
                             firestore.collectionGroup(reservas)
-                                .whereEqualTo("fecha", reserva.getFecha())
-                                .whereEqualTo("vehicleId", reserva.getVehicleId())
+                                .whereEqualTo(FIELD_FECHA, reserva.getFecha())
+                                .whereEqualTo(FIELD_VEHICLE_ID, reserva.getVehicleId())
                                 .get()
                                 .addOnSuccessListener(vehicleDocs -> {
                                     boolean solapadaVehiculo = false;
@@ -550,19 +565,19 @@ public class DataRepository {
                                     }
                                 })
                                 .addOnFailureListener(e -> {
-                                    android.util.Log.e(FIRESTORE_ERROR, "Error al comprobar solapamiento de reservas de vehículo", e);
-                                    callback.onFailure("Error al comprobar solapamiento de reservas de vehículo");
+                                    android.util.Log.e(FIRESTORE_ERROR, ERROR_SOLAPAMIENTO_RESERVAS_VEHICULO, e);
+                                    callback.onFailure(ERROR_SOLAPAMIENTO_RESERVAS_VEHICULO);
                                 });
                         }
                     })
                     .addOnFailureListener(e -> {
-                        android.util.Log.e(FIRESTORE_ERROR, "Error al comprobar solapamiento de reservas", e);
-                        callback.onFailure("Error al comprobar solapamiento de reservas");
+                        android.util.Log.e(FIRESTORE_ERROR, ERROR_SOLAPAMIENTO_RESERVAS, e);
+                        callback.onFailure(ERROR_SOLAPAMIENTO_RESERVAS);
                     });
             })
             .addOnFailureListener(e -> {
-                android.util.Log.e(FIRESTORE_ERROR, "Error al comprobar existencia de vehículo", e);
-                callback.onFailure("Error al comprobar existencia de vehículo");
+                android.util.Log.e(FIRESTORE_ERROR, ERROR_EXISTENCIA_VEHICULO, e);
+                callback.onFailure(ERROR_EXISTENCIA_VEHICULO);
             });
     }
 
@@ -609,7 +624,7 @@ public class DataRepository {
 
         // Buscar reservas existentes para esa fecha y hora
         firestore.collectionGroup(reservas)
-            .whereEqualTo("fecha", fecha)
+            .whereEqualTo(FIELD_FECHA, fecha)
             .get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 List<com.lksnext.parkingplantilla.domain.Reserva> reservasExistentes = new ArrayList<>();
@@ -652,7 +667,7 @@ public class DataRepository {
     public void checkLicensePlateExists(String userId, String licensePlate, String currentVehicleId, Callback callback) {
         firestore.collection(users).document(userId)
             .collection(vehicles)
-            .whereEqualTo("licensePlate", licensePlate)
+            .whereEqualTo(FIELD_VEHICLE_ID, licensePlate)
             .get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 boolean exists = false;
@@ -703,7 +718,7 @@ public class DataRepository {
             .get()
             .addOnSuccessListener(documentSnapshot -> {
                 if (documentSnapshot.exists()) {
-                    String username = documentSnapshot.getString("username");
+                    String username = documentSnapshot.getString(FIELD_USERNAME);
                     usernameLiveData.postValue(username);
                 }
             })
