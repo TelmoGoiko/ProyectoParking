@@ -96,11 +96,12 @@ public class MisReservasFragment extends Fragment {
                     .setNegativeButton(getString(R.string.cancelar), null)
                     .show();
                 return true;
-            });
-
+            }
+        );
         binding.recyclerViewReservas.setAdapter(reservasAdapter);
 
-        // Observar las reservas del usuario
+        // Eliminar la lógica de vehículos y la observación de getVehiclesLiveData
+        // Solo dejamos la carga de reservas
         cargarReservasDeUsuario();
     }
 
@@ -130,53 +131,72 @@ public class MisReservasFragment extends Fragment {
             binding.tvNoReservas.setVisibility(View.GONE);
             binding.recyclerViewReservas.setVisibility(View.VISIBLE);
 
-            // Convertir las reservas de dominio a modelo para el adaptador
-            List<com.lksnext.parkingplantilla.model.Reserva> reservasModelo = new ArrayList<>();
-
-            // Mapeo de IDs de reservas para poder eliminarlas luego
-            reservasIdMap = new HashMap<>();
-
-            for (Reserva reservaDominio : reservasDominio) {
-                // Formatear fechas y horas para mostrar
-                SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm", Locale.getDefault());
-
-                String nombreParking = "Plaza " + (reservaDominio.getPlazaId() != null ?
-                        reservaDominio.getPlazaId().getId() : "N/A");
-
-                String fecha = reservaDominio.getFecha();
-
-                String horaInicio = "N/A";
-                String horaFin = "N/A";
-
-                if (reservaDominio.getHoraInicio() != null) {
-                    try {
-                        SimpleDateFormat sdfFecha = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                        Date fechaBase = sdfFecha.parse(fecha);
-                        Date dateInicio = new Date(fechaBase.getTime() + reservaDominio.getHoraInicio().getHoraInicio() * 1000);
-                        Date dateFin = new Date(fechaBase.getTime() + reservaDominio.getHoraInicio().getHoraFin() * 1000);
-                        horaInicio = sdfHora.format(dateInicio);
-                        horaFin = sdfHora.format(dateFin);
-                    } catch (java.text.ParseException e) {
-                        horaInicio = "?";
-                        horaFin = "?";
+            // Obtener la lista de vehículos directamente del DataRepository
+            List<com.lksnext.parkingplantilla.model.Vehicle> vehiculosUsuario = new ArrayList<>();
+            com.lksnext.parkingplantilla.data.DataRepository.getInstance().getVehicles(
+                reservasViewModel.getCurrentUserId(),
+                new androidx.lifecycle.MutableLiveData<List<com.lksnext.parkingplantilla.model.Vehicle>>() {
+                    @Override
+                    public void postValue(List<com.lksnext.parkingplantilla.model.Vehicle> value) {
+                        super.postValue(value);
+                        vehiculosUsuario.clear();
+                        if (value != null) vehiculosUsuario.addAll(value);
+                        // Ahora que tenemos la lista de vehículos, convertimos las reservas
+                        convertirReservas(reservasDominio, vehiculosUsuario);
                     }
                 }
+            );
+        });
+    }
 
-                String estado = reservaDominio.getEstado() != null ? reservaDominio.getEstado() : "Confirmada"; // Por defecto todas las reservas están confirmadas
+    private void convertirReservas(List<Reserva> reservasDominio, List<com.lksnext.parkingplantilla.model.Vehicle> vehiculosUsuario) {
+        List<com.lksnext.parkingplantilla.model.Reserva> reservasModelo = new ArrayList<>();
+        reservasIdMap = new HashMap<>();
+        for (Reserva reservaDominio : reservasDominio) {
+            // Formatear fechas y horas para mostrar
+            SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
-                com.lksnext.parkingplantilla.model.Reserva reservaModelo =
-                    new com.lksnext.parkingplantilla.model.Reserva(
-                        nombreParking, fecha, horaInicio, horaFin, estado);
+            String nombreParking = "Plaza " + (reservaDominio.getPlazaId() != null ?
+                    reservaDominio.getPlazaId().getId() : "N/A");
 
-                reservasModelo.add(reservaModelo);
+            String fecha = reservaDominio.getFecha();
 
-                // Guardar mapeo entre la reserva del modelo y su ID real
-                reservasIdMap.put(reservaModelo, reservaDominio.getId());
+            String horaInicio = "N/A";
+            String horaFin = "N/A";
+
+            if (reservaDominio.getHoraInicio() != null) {
+                try {
+                    SimpleDateFormat sdfFecha = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                    Date fechaBase = sdfFecha.parse(fecha);
+                    Date dateInicio = new Date(fechaBase.getTime() + reservaDominio.getHoraInicio().getHoraInicio() * 1000);
+                    Date dateFin = new Date(fechaBase.getTime() + reservaDominio.getHoraInicio().getHoraFin() * 1000);
+                    horaInicio = sdfHora.format(dateInicio);
+                    horaFin = sdfHora.format(dateFin);
+                } catch (java.text.ParseException e) {
+                    horaInicio = "?";
+                    horaFin = "?";
+                }
             }
 
-            // Actualizar adaptador con las nuevas reservas
-            reservasAdapter.actualizarReservas(reservasModelo);
-        });
+            String estado = reservaDominio.getEstado() != null ? reservaDominio.getEstado() : "Confirmada"; // Por defecto todas las reservas están confirmadas
+
+            // Obtener nombre y matrícula del vehículo para esta reserva
+            String nombreVehiculo = "";
+            String matriculaVehiculo = "";
+            for (com.lksnext.parkingplantilla.model.Vehicle v : vehiculosUsuario) {
+                if (v.getId().equals(reservaDominio.getVehicleId())) {
+                    nombreVehiculo = v.getName();
+                    matriculaVehiculo = v.getLicensePlate();
+                    break;
+                }
+            }
+            com.lksnext.parkingplantilla.model.Reserva reservaModelo =
+                new com.lksnext.parkingplantilla.model.Reserva(
+                    nombreParking, fecha, horaInicio, horaFin, estado, reservaDominio.getVehicleId(), nombreVehiculo, matriculaVehiculo);
+            reservasModelo.add(reservaModelo);
+            reservasIdMap.put(reservaModelo, reservaDominio.getId());
+        }
+        reservasAdapter.actualizarReservas(reservasModelo);
     }
 
     private void eliminarReserva(String plazaId) {

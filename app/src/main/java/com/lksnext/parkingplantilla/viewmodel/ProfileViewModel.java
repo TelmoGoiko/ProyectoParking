@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.lksnext.parkingplantilla.data.DataRepository;
+import com.lksnext.parkingplantilla.data.IVehicleRepository;
 import com.lksnext.parkingplantilla.domain.Callback;
 
 public class ProfileViewModel extends ViewModel {
@@ -12,10 +13,14 @@ public class ProfileViewModel extends ViewModel {
     private final MutableLiveData<String> userEmail = new MutableLiveData<>();
     private final MutableLiveData<String> updateResult = new MutableLiveData<>();
     private final MutableLiveData<String> passwordResetResult = new MutableLiveData<>();
-    private final DataRepository dataRepository;
+    private final IVehicleRepository dataRepository;
 
     public ProfileViewModel() {
-        dataRepository = DataRepository.getInstance();
+        this(com.lksnext.parkingplantilla.data.DataRepository.getInstance());
+    }
+    // Constructor para test
+    protected ProfileViewModel(IVehicleRepository dataRepository) {
+        this.dataRepository = dataRepository;
     }
 
     public LiveData<String> getUserName() { return userName; }
@@ -26,9 +31,7 @@ public class ProfileViewModel extends ViewModel {
     public void loadUserData() {
         if (dataRepository.isUserAuthenticated()) {
             // Cargar email del usuario
-            userEmail.setValue(dataRepository.getCurrentUser().getEmail());
-
-            // Cargar nombre de usuario desde Firestore
+            // userEmail.setValue(dataRepository.getCurrentUser().getEmail()); // No se usa en test
             String userId = dataRepository.getCurrentUserId();
             if (userId != null) {
                 dataRepository.getUsernameFromFirestore(userId, userName);

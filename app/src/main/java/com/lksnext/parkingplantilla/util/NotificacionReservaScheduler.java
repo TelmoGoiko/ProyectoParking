@@ -10,8 +10,13 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-public class NotificacionReservaScheduler {
-    public static void programarNotificaciones(Context context, String fecha, long horaInicio, String plaza) {
+public class NotificacionReservaScheduler implements IReservaNotificationScheduler {
+    private final Context context;
+    public NotificacionReservaScheduler(Context context) {
+        this.context = context;
+    }
+    @Override
+    public void programarNotificaciones(String fecha, long horaInicio, String plaza) {
         try {
             Log.d("NotificacionReserva", "[DEBUG] Entrada: fecha=" + fecha + ", horaInicio(segundos)=" + horaInicio + ", plaza=" + plaza);
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());

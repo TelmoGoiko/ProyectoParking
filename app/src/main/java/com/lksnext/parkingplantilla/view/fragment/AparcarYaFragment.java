@@ -158,22 +158,54 @@ public class AparcarYaFragment extends Fragment {
             // Crear objeto Hora
             Hora hora = new Hora(horaInicio, horaFin);
 
-            // Pasar datos al siguiente fragmento (SeleccionarPlazaFragment)
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("selectedVehicle", selectedVehicle);
-            bundle.putString("fecha", fechaFormatted);
-            bundle.putLong("horaInicio", horaInicio);
-            bundle.putLong("horaFin", horaFin);
-            bundle.putBoolean("aparcarYa", true); // Flag para indicar que viene de AparcarYa
+            // Comprobar si hay reservas solapadas con el mismo vehículo antes de continuar
+            reservasViewModel.loadUserReservas();
+            reservasViewModel.getUserReservas().observe(getViewLifecycleOwner(), reservas -> {
+                boolean solapada = false;
+                if (reservas != null) {
+                    for (com.lksnext.parkingplantilla.domain.Reserva r : reservas) {
+                        // Solo comprobar solapamiento si es el mismo vehículo
+                        if (r.getVehicleId() != null && r.getVehicleId().equals(selectedVehicle.getId()) &&
+                            r.getFecha() != null && r.getFecha().equals(fechaFormatted) &&
+                            r.getHoraInicio() != null) {
 
-            // Cargar plazas disponibles
-            reservasViewModel.loadAvailablePlazas(fechaFormatted, hora);
+                            long start1 = r.getHoraInicio().getHoraInicio();
+                            long end1 = r.getHoraInicio().getHoraFin();
 
-            // Navegar al fragmento de selección de plaza
-            Navigation.findNavController(requireView()).navigate(
-                    R.id.action_aparcarYaFragment_to_seleccionarPlazaFragment,
-                    bundle
-            );
+                            // Verificar solapamiento de horarios
+                            if (horaInicio < end1 && start1 < horaFin) {
+                                solapada = true;
+                                android.util.Log.d("RESERVA_DEBUG", "Solapamiento detectado con reserva existente: " + r.getId() +
+                                    " - Mismo vehículo: " + r.getVehicleId() +
+                                    " - Fecha: " + r.getFecha() +
+                                    " - Hora: " + start1 + "-" + end1);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (solapada) {
+                    Toast.makeText(getContext(), "Este vehículo ya tiene una reserva en ese rango horario. No puedes reservar dos plazas a la vez con el mismo vehículo.", Toast.LENGTH_LONG).show();
+                } else {
+                    // Pasar datos al siguiente fragmento (SeleccionarPlazaFragment)
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("selectedVehicle", selectedVehicle);
+                    bundle.putString("fecha", fechaFormatted);
+                    bundle.putLong("horaInicio", horaInicio);
+                    bundle.putLong("horaFin", horaFin);
+                    bundle.putBoolean("aparcarYa", true); // Flag para indicar que viene de AparcarYa
+
+                    // Cargar plazas disponibles
+                    reservasViewModel.loadAvailablePlazas(fechaFormatted, hora);
+
+                    // Navegar al fragmento de selección de plaza
+                    Navigation.findNavController(requireView()).navigate(
+                            R.id.action_aparcarYaFragment_to_seleccionarPlazaFragment,
+                            bundle
+                    );
+                }
+            });
         });
     }
 
