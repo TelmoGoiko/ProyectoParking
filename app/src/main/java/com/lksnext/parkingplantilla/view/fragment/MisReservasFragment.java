@@ -162,7 +162,7 @@ public class MisReservasFragment extends Fragment {
                     }
                 }
 
-                String estado = "Confirmada"; // Por defecto todas las reservas están confirmadas
+                String estado = reservaDominio.getEstado() != null ? reservaDominio.getEstado() : "Confirmada"; // Por defecto todas las reservas están confirmadas
 
                 com.lksnext.parkingplantilla.model.Reserva reservaModelo =
                     new com.lksnext.parkingplantilla.model.Reserva(

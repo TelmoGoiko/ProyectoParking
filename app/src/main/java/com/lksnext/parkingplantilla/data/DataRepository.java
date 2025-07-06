@@ -335,6 +335,10 @@ public class DataRepository {
                                         if (reserva.getId() == null || reserva.getId().isEmpty()) {
                                             reserva.setId(firestore.collection(reservas).document().getId());
                                         }
+                                        // Si no se especifica estado, poner 'Confirmada' por defecto
+                                        if (reserva.getEstado() == null || reserva.getEstado().isEmpty()) {
+                                            reserva.setEstado("Confirmada");
+                                        }
                                         firestore.collection(users).document(userId)
                                             .collection(reservas).document(reserva.getId())
                                             .set(reserva)
@@ -370,24 +374,51 @@ public class DataRepository {
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 List<com.lksnext.parkingplantilla.domain.Reserva> reservasList = new ArrayList<>();
                 java.util.Date now = new java.util.Date();
+                boolean anyFinalizada = false;
                 for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                     com.lksnext.parkingplantilla.domain.Reserva reserva = doc.toObject(com.lksnext.parkingplantilla.domain.Reserva.class);
                     if (reserva != null) {
                         boolean needsUpdate = false;
-                        // Si la reserva tiene hora de fin y ya ha pasado, marcar como finalizada
-                        if (reserva.getHoraInicio() != null && reserva.getEstado() != null && !"finalizada".equals(reserva.getEstado())) {
-                            long fin = reserva.getHoraInicio().getHoraFin() * 1000L; // asume segundos
-                            if (now.getTime() > fin) {
-                                reserva.setEstado("finalizada");
-                                needsUpdate = true;
+                        String nuevoEstado = null;
+                        if (reserva.getHoraInicio() != null && reserva.getEstado() != null) {
+                            try {
+                                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+                                java.util.Date fechaBase = sdf.parse(reserva.getFecha());
+                                long inicio = fechaBase.getTime() + reserva.getHoraInicio().getHoraInicio() * 1000L;
+                                long fin = fechaBase.getTime() + reserva.getHoraInicio().getHoraFin() * 1000L;
+                                long ahora = now.getTime();
+                                if (ahora < inicio && !"Confirmada".equals(reserva.getEstado())) {
+                                    nuevoEstado = "Confirmada";
+                                    needsUpdate = true;
+                                } else if (ahora >= inicio && ahora < fin && !"En curso".equals(reserva.getEstado())) {
+                                    nuevoEstado = "En curso";
+                                    needsUpdate = true;
+                                } else if (ahora >= fin && !"Finalizada".equals(reserva.getEstado())) {
+                                    nuevoEstado = "Finalizada";
+                                    needsUpdate = true;
+                                    anyFinalizada = true;
+                                }
+                            } catch (Exception e) {
+                                android.util.Log.e("RESERVA_ESTADO", "Error al parsear fecha para reserva " + reserva.getId(), e);
                             }
                         }
-                        if (needsUpdate) {
-                            // Actualizar en Firestore
-                            doc.getReference().update("estado", "finalizada");
+                        if (needsUpdate && nuevoEstado != null) {
+                            reserva.setEstado(nuevoEstado);
+                            android.util.Log.i("RESERVA_ESTADO", "Reserva " + reserva.getId() + " actualizada a '" + nuevoEstado + "'");
+                            doc.getReference().update("estado", nuevoEstado)
+                                .addOnSuccessListener(aVoid -> {
+                                    getReservasByUser(userId, liveData);
+                                });
+                            return;
                         }
                         reservasList.add(reserva);
                     }
+                }
+                if (anyFinalizada) {
+                    // Forzar recarga para reflejar el estado actualizado en la UI
+                    android.util.Log.d("RESERVA_Finalizada", "Se han actualizado reservas a Finalizada. Forzando recarga...");
+                    getReservasByUser(userId, liveData);
+                    return;
                 }
                 liveData.postValue(reservasList);
             })
@@ -414,6 +445,11 @@ public class DataRepository {
 
     // Actualizar una reserva existente
     public void updateReserva(String userId, com.lksnext.parkingplantilla.domain.Reserva reserva, Callback callback) {
+        // Solo permitir edición si la reserva está en estado 'Confirmada'
+        if (reserva.getEstado() != null && !"Confirmada".equalsIgnoreCase(reserva.getEstado())) {
+            callback.onFailure("Solo se puede editar una reserva Confirmada (antes de su inicio).");
+            return;
+        }
         // Validación: duración máxima 8 horas
         if (reserva.getHoraInicio() != null) {
             long duracionSegundos = reserva.getHoraInicio().getHoraFin() - reserva.getHoraInicio().getHoraInicio();

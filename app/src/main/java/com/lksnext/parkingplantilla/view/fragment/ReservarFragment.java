@@ -182,6 +182,95 @@ public class ReservarFragment extends Fragment {
                 return;
             }
 
+            // Si es edición, comprobar si la reserva está finalizada antes de permitir editar
+            if (isEditMode) {
+                reservasViewModel.getSelectedReserva().observe(getViewLifecycleOwner(), reservaObs -> {
+                    if (reservaObs != null && reservaObs.getEstado() != null && !"pendiente".equalsIgnoreCase(reservaObs.getEstado())) {
+                        Toast.makeText(getContext(), "Solo se puede editar una reserva pendiente (antes de su inicio)", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    // Validar fechas y horas
+                    Calendar fechaHoraEntrada = Calendar.getInstance();
+                    fechaHoraEntrada.set(
+                            binding.datePickerEntrada.getYear(),
+                            binding.datePickerEntrada.getMonth(),
+                            binding.datePickerEntrada.getDayOfMonth(),
+                            binding.timePickerEntrada.getHour(),
+                            binding.timePickerEntrada.getMinute()
+                    );
+
+                    Calendar fechaHoraSalida = Calendar.getInstance();
+                    fechaHoraSalida.set(
+                            binding.datePickerSalida.getYear(),
+                            binding.datePickerSalida.getMonth(),
+                            binding.datePickerSalida.getDayOfMonth(),
+                            binding.timePickerSalida.getHour(),
+                            binding.timePickerSalida.getMinute()
+                    );
+
+                    // Verificar que la fecha/hora de entrada sea anterior a la de salida
+                    if (fechaHoraEntrada.after(fechaHoraSalida)) {
+                        Toast.makeText(getContext(), "La fecha y hora de entrada debe ser anterior a la de salida", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Verificar que la fecha/hora de entrada sea posterior a la actual
+                    Calendar ahora = Calendar.getInstance();
+                    if (fechaHoraEntrada.before(ahora)) {
+                        Toast.makeText(getContext(), "La fecha y hora de entrada debe ser posterior a la actual", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Validar que la fecha seleccionada esté entre hoy y 7 días
+                    Calendar hoy = Calendar.getInstance();
+                    hoy.set(Calendar.HOUR_OF_DAY, 0);
+                    hoy.set(Calendar.MINUTE, 0);
+                    hoy.set(Calendar.SECOND, 0);
+                    hoy.set(Calendar.MILLISECOND, 0);
+                    Calendar maxFecha = (Calendar) hoy.clone();
+                    maxFecha.add(Calendar.DAY_OF_YEAR, 7);
+                    Calendar fechaSeleccionada = Calendar.getInstance();
+                    fechaSeleccionada.set(binding.datePickerEntrada.getYear(), binding.datePickerEntrada.getMonth(), binding.datePickerEntrada.getDayOfMonth(), 0, 0, 0);
+                    fechaSeleccionada.set(Calendar.MILLISECOND, 0);
+                    if (fechaSeleccionada.before(hoy) || fechaSeleccionada.after(maxFecha)) {
+                        Toast.makeText(getContext(), "Solo puedes reservar desde hoy hasta 7 días naturales.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Validar que la diferencia entre entrada y salida no supere 8 horas
+                    long diffMillisHoras = fechaHoraSalida.getTimeInMillis() - fechaHoraEntrada.getTimeInMillis();
+                    if (diffMillisHoras > 8 * 60 * 60 * 1000) {
+                        Toast.makeText(getContext(), "La reserva no puede superar las 8 horas.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Formatear fechas y horas
+                    int dayEntrada = binding.datePickerEntrada.getDayOfMonth();
+                    int monthEntrada = binding.datePickerEntrada.getMonth() + 1;
+                    int yearEntrada = binding.datePickerEntrada.getYear();
+                    String fechaFormatted = String.format("%02d/%02d/%04d", dayEntrada, monthEntrada, yearEntrada);
+
+                    // Calcular segundos desde medianoche para horaInicio y horaFin
+                    Calendar medianoche = (Calendar) fechaHoraEntrada.clone();
+                    medianoche.set(Calendar.HOUR_OF_DAY, 0);
+                    medianoche.set(Calendar.MINUTE, 0);
+                    medianoche.set(Calendar.SECOND, 0);
+                    medianoche.set(Calendar.MILLISECOND, 0);
+                    long horaInicio = (fechaHoraEntrada.getTimeInMillis() - medianoche.getTimeInMillis()) / 1000;
+                    long horaFin = (fechaHoraSalida.getTimeInMillis() - medianoche.getTimeInMillis()) / 1000;
+                    Hora hora = new Hora(horaInicio, horaFin);
+
+                    // Confirmar edición y guardar cambios
+                    reservaObs.setFecha(fechaFormatted);
+                    reservaObs.setHoraInicio(hora);
+                    reservasViewModel.updateReserva(reservaObs);
+                    Toast.makeText(getContext(), "Reserva actualizada", Toast.LENGTH_SHORT).show();
+                    requireActivity().onBackPressed();
+                });
+                return;
+            }
+
             // Validar fechas y horas
             Calendar fechaHoraEntrada = Calendar.getInstance();
             fechaHoraEntrada.set(

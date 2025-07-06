@@ -146,19 +146,24 @@ public class AparcarYaFragment extends Fragment {
             int year = fechaHoraEntrada.get(Calendar.YEAR);
             String fechaFormatted = String.format("%02d/%02d/%04d", day, month, year);
 
-            // Convertir a timestamp (segundos desde epoch) para la clase Hora
-            long horaInicioTimestamp = fechaHoraEntrada.getTimeInMillis() / 1000;
-            long horaFinTimestamp = fechaHoraSalida.getTimeInMillis() / 1000;
+            // Calcular segundos desde medianoche local para la fecha de entrada
+            Calendar medianoche = (Calendar) fechaHoraEntrada.clone();
+            medianoche.set(Calendar.HOUR_OF_DAY, 0);
+            medianoche.set(Calendar.MINUTE, 0);
+            medianoche.set(Calendar.SECOND, 0);
+            medianoche.set(Calendar.MILLISECOND, 0);
+            long horaInicio = (fechaHoraEntrada.getTimeInMillis() - medianoche.getTimeInMillis()) / 1000;
+            long horaFin = (fechaHoraSalida.getTimeInMillis() - medianoche.getTimeInMillis()) / 1000;
 
             // Crear objeto Hora
-            Hora hora = new Hora(horaInicioTimestamp, horaFinTimestamp);
+            Hora hora = new Hora(horaInicio, horaFin);
 
             // Pasar datos al siguiente fragmento (SeleccionarPlazaFragment)
             Bundle bundle = new Bundle();
             bundle.putSerializable("selectedVehicle", selectedVehicle);
             bundle.putString("fecha", fechaFormatted);
-            bundle.putLong("horaInicio", horaInicioTimestamp);
-            bundle.putLong("horaFin", horaFinTimestamp);
+            bundle.putLong("horaInicio", horaInicio);
+            bundle.putLong("horaFin", horaFin);
             bundle.putBoolean("aparcarYa", true); // Flag para indicar que viene de AparcarYa
 
             // Cargar plazas disponibles

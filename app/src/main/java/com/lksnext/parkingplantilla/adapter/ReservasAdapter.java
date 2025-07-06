@@ -73,7 +73,16 @@ public class ReservasAdapter extends RecyclerView.Adapter<ReservasAdapter.Reserv
             binding.tvHorario.setText(String.format("%s - %s", reserva.getHoraInicio(), reserva.getHoraFin()));
             binding.tvEstado.setText(reserva.getEstado());
 
-            binding.btnEditar.setOnClickListener(v -> editListener.onEditClick(reserva));
+            // Mostrar el botón de editar solo si la reserva está en estado 'Confirmada'
+            if (reserva.getEstado() != null && reserva.getEstado().equalsIgnoreCase("Confirmada")) {
+                binding.btnEditar.setVisibility(android.view.View.VISIBLE);
+                binding.btnEditar.setEnabled(true);
+                binding.btnEditar.setAlpha(1f);
+                binding.btnEditar.setOnClickListener(v -> editListener.onEditClick(reserva));
+            } else {
+                binding.btnEditar.setVisibility(android.view.View.GONE);
+                binding.btnEditar.setEnabled(false);
+            }
             binding.btnEliminar.setOnClickListener(v -> deleteListener.onDeleteClick(reserva));
         }
     }

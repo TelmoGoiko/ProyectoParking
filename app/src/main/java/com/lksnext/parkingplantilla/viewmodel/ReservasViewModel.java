@@ -122,6 +122,12 @@ public class ReservasViewModel extends androidx.lifecycle.AndroidViewModel {
     public void updateReserva(Reserva reserva) {
         String userId = repository.getCurrentUserId();
         if (userId != null) {
+            // Solo permitir edición si la reserva está en estado 'pendiente'
+            if (reserva.getEstado() != null && !"pendiente".equalsIgnoreCase(reserva.getEstado())) {
+                errorMessage.setValue("Solo se puede editar una reserva pendiente (antes de su inicio).");
+                reservaUpdated.setValue(false);
+                return;
+            }
             repository.updateReserva(userId, reserva, new Callback() {
                 @Override
                 public void onSuccess() {
