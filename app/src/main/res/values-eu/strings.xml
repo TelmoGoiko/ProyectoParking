@@ -1,5 +1,5 @@
 <resources>
-    <string name="APP_name">ParkingPlantilla</string>
+    <string name="app_name">ParkingPlantilla</string>
     <string name="selectDate">Aukeratu data bat</string>
     <string name="fragment_main">Nagusia</string>
     <string name="fragment_step1">1. urratsa</string>

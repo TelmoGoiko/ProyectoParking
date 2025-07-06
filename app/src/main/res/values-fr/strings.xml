@@ -1,5 +1,5 @@
 <resources>
-    <string name="APP_name">ParkingPlantilla</string>
+    <string name="app_name">ParkingPlantilla</string>
     <string name="selectDate">Sélectionnez une date</string>
     <string name="fragment_main">Principal</string>
     <string name="fragment_step1">Étape 1</string>
