@@ -21,9 +21,9 @@ sonarqube {
         property "sonar.host.url", "https://sonarcloud.io"
 
         // JaCoCo configuration for SonarCloud
-        property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+        property "sonar.coverage.jacoco.xmlReportPaths", "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
         property "sonar.java.coveragePlugin", "jacoco"
-        property "sonar.coverage.exclusions", "**/*R.class,  **/*BuildConfig.*, **/*Manifest*.*, **/*Test*.*, android/**/*.*"
+        property "sonar.coverage.exclusions", "**/*Test*.*,**/R.class,**/BuildConfig.*,**/Manifest*.*,android/**/*.*"
     }
 }
 
